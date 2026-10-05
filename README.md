@@ -1,5 +1,7 @@
 # ribbonkit
 
+> **Commercial licences available.** ribbonkit is free and open source under the GNU General Public License, version 3 (GPL-3.0). If those terms do not suit what you are building, such as a closed-source product, a commercial licence can be bought from me separately. It covers my own code; third-party libraries keep their own licences. See [commercial licensing](https://ernster.dev/commercial-licensing.html).
+
 The desktop half of a ribbon application, written once: a narrow always-available window docked to
 an edge of the screen, with the content of the application drawn inside it. TimeRibbon (a ribbon of
 clocks) and WeatherRibbon are built on it, so a fix to how a ribbon is placed, dragged, scaled or
@@ -88,4 +90,6 @@ what that covers and what is checked on macOS and Linux.
 
 ## Licence
 
-GPL-3.0; see [LICENSE](LICENSE).
+GNU General Public License, version 3: see [LICENSE](LICENSE).
+
+Commercial licences are available: see [commercial licensing](https://ernster.dev/commercial-licensing.html).

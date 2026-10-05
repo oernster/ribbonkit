@@ -21,17 +21,6 @@ Cost of leaving it: low. Every act hands straight to `infrastructure/setup`, tes
 decision is seen whenever setup is run by hand. Resolving it means giving the facade ports for the
 machine and the processes, which its tests then fake. Not blocked.
 
-## 2. A Linux and macOS test writes a panel's size in
-
-`TestTheRibbonReturnsFromAPanelToWhereItIsPlaced` in `infrastructure/desktop/ribbon_unix_test.go`
-writes the panel's size in as 560 by 760, which was TimeRibbon's About panel when the test was
-written. The kit knows no application's panels, so the number can no longer be a copy of anything; it
-stands for any window larger than the ribbon.
-
-Cost of leaving it: low. The test still proves the ribbon returns to where it was placed after a
-larger window. Blocked on an owner decision: whether this is now a sample size (which would make it
-not debt) or whether the test should name its size as one.
-
 ## Looks like debt, not worth touching
 
 **The drag sends Wails an internal message.** `startDrag` calls `window.WailsInvoke('drag')`, the
@@ -49,6 +38,11 @@ least one cell, so that branch is the domain's own tested contract at the cost o
 step and can import nothing; `setupRing.test.ts` holds the shipped script to the same behaviour. The
 self-reading cycle went the other way because the window's build can import from the setup page's
 folder.
+
+**A Linux and macOS test writes a panel's size in.** `TestTheRibbonReturnsFromAPanelToWhereItIsPlaced`
+(`infrastructure/desktop/ribbon_unix_test.go`) opens a 560 by 760 window. The kit knows no
+application's panels, so this is a sample of any window larger than the ribbon, not a copy of one
+(ruled by Oliver, 2026-10-05).
 
 **The setup program holds no install logic.** Every act goes through `infrastructure/setup`.
 
