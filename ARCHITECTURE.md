@@ -82,7 +82,13 @@ no test watches for that.
     of any other ribbon its `Neighbours` port reports, its own pull out included, else at the
     opposite edge, never while the grip is dragged; the result is then held for the others (FR-412).
     A nil port is `NoNeighbours`, a ribbon alone.
-  - `menus`: the menu model (`Item`) and the actions every ribbon offers.
+  - `controls`: the ribbon's own use cases over the same `Host`: choosing its colour, orientation,
+    theme, opacity, Always on top and the pin, a value not offered refused; start at sign-in through
+    a `Startup` port; the update check and the release the user skipped. An application embeds
+    `Controls` in its service beside the arranger.
+  - `menus`: the menu model (`Item`), the actions every ribbon offers and their items with their
+    words (show or hide, Settings, Colour, Orientation, Position, Always on top, Pin, Help, Exit),
+    built from the ribbon's choices. Each application lists them in its own order among its own.
   - `release`: the update check's rules over a `Source` (FR-509).
   - `shell`: the desktop port, `shell.Desktop`, which `desktop` implements.
 - **Infrastructure.** On every platform `system` (wall clock, ids), `update`, `iconscale`, `zones`

@@ -28,7 +28,7 @@ figure with the fraction dropped, so it fails once cover is lost.
 | Package | Coverage | Floor |
 |---|---|---|
 | `domain/hover`, `localtime`, `placement`, `ribbon` | 100% | 100% |
-| `application/arranger`, `menus`, `release` | 100% | 100% |
+| `application/arranger`, `controls`, `menus`, `release` | 100% | 100% |
 | `infrastructure/appdata`, `heldfile`, `iconscale`, `system`, `update`, `zones` | 100% | 100% |
 | `infrastructure/settingsfile` | 97.3% | 97% |
 | `ui/window` | 93.8% | 93% |
@@ -44,11 +44,11 @@ figure with the fraction dropped, so it fails once cover is lost.
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 347 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 357 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 317 and the Linux build 322 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 327 and the Linux build 332 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -141,7 +141,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 317, plus 3 `TestMain` | 322, plus 3 `TestMain` |
+| Go test functions | 327, plus 3 `TestMain` | 332, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 
