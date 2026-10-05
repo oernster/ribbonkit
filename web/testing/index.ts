@@ -6,6 +6,8 @@ import { vi } from 'vitest'
 import { connect, windowCalls, type WindowBridge } from '../bridge'
 import type { AboutFacts } from '../wire'
 
+export { describePageTimers, FRAME, type AllowedSite } from './timers'
+
 /** sampleName stands for the application the kit's tests run for. */
 export const sampleName = 'SampleRibbon'
 

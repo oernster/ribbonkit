@@ -42,6 +42,7 @@ mechanics in `structure` ([below](#outside-the-layers)); a guard not listed here
 | The setup page loads every script beside it | `TestTheSetupPageLoadsEveryScript` | [`setup_test.go`](tests/structural/setup_test.go) |
 | Every scheme the menus offer has a block in `colours.css` stating each of Classic's tokens (the problem colour aside); every block is offered (FR-611) | `TestEveryOfferedSchemeHasItsOwnCompleteBlock` | [`colours_test.go`](tests/structural/colours_test.go) |
 | Classic's dark colours are the same under the system's dark mode as under a chosen dark theme | `TestClassicDarkIsTheSameUnderTheSystemAsWhenChosen` | [`colours_test.go`](tests/structural/colours_test.go) |
+| The ribbon's text tokens meet 4.5:1 on its cell and surface in every offered scheme, light and dark | `TestTheKitsTextMeetsTheContrastFloor` | [`colours_test.go`](tests/structural/colours_test.go) |
 | The window's wire is stated alike in `ui/window/wire.go` and `web/wire.ts` | `TestTheWireIsStatedAlikeOnBothSides` | [`wire_test.go`](tests/structural/wire_test.go) |
 | The page listens for every event the window emits and keys every panel it names | `TestThePageNamesEveryEventTheWindowEmits` | [`wire_test.go`](tests/structural/wire_test.go) |
 | The setup page listens for every event the setup facade emits | `TestTheSetupPageNamesEveryEventSetupEmits` | [`wire_test.go`](tests/structural/wire_test.go) |
@@ -136,8 +137,9 @@ no test watches for that.
   words to its panels, reloads on Go's refresh and draws the theme, colour scheme and opacity.
   Help, About and Licence are its panels (`Help.tsx`, `help.css`). The palette's ribbon half is
   `theme.css` (Classic) and `colours.css` (every other scheme). `web/testing` is the stand-in bridge
-  and Go's events for an application's tests; `web/testing/setup.ts` is the one test set-up both run
-  under. Each component takes only the values it draws; a module that reaches Go is handed the calls
+  and Go's events for an application's tests, plus `describePageTimers`, the scan holding an
+  application's whole page (the kit's half included) to its timer allow-list; `web/testing/setup.ts`
+  is the one test set-up both run under. Each component takes only the values it draws; a module that reaches Go is handed the calls
   it needs.
 - **`installer`**, the setup program's window over `setup`: the setup page (`page/`, no build step),
   the facade the page calls (`facade.go`), `Run` (which opens the window) and `Main`, the whole of a
@@ -145,7 +147,7 @@ no test watches for that.
   an application's setup command only names its product and carries its payload and pictures. It is a
   program's window rather than a layer and imports nothing of the kit but the install policy.
 - **`structure`**, the structural tests' mechanics: finding a repository's files, reading imports,
-  counting lines and the layer, size, network, palette and wire checks over a `Layout` (its module,
+  counting lines and the layer, size, network, palette, contrast and wire checks over a `Layout` (its module,
   its layered folders, the modules it depends on and its composition root). The kit's own tests use
   it; so does each application, so both are held by the same code.
 

@@ -40,26 +40,27 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
 | `infrastructure/desktop` | 49.7% | 49% |
-| `structure` | 22.2% | 22% |
+| `structure` | 33.6% | 33% |
 | `installer` | 12.8% | 12% |
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 379 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 381 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
-`infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
+`infrastructure/setup`. Twenty-three are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 343 and the Linux build 349 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 345 and the Linux build 351 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
-96 tests in 14 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
+102 tests in 15 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
 been drawn (`Band.test.tsx`, FR-614, FR-615); the pull out's handle (`PullOut.test.tsx`); the shell's
 panels, refreshes, theme and colour scheme (`shell.test.tsx`); the opacity and its slider
 (`opacity.test.ts`, `OpacitySlider.test.tsx`, FR-622); the corner grip (`ScaleGrip.test.tsx`,
 FR-623); Help, About and Licence and their self-reading cycle (`Help.test.tsx`,
 `autoScroll.test.ts`); a panel fitting its content (`panelFit.test.tsx`, FR-621); the background
-colour reported to Go (`background.test.ts`); the `devicePixelRatio` watch (`pixelRatio.test.ts`); the setup page's screens, its keyboard ring and
+colour reported to Go (`background.test.ts`); the `devicePixelRatio` watch (`pixelRatio.test.ts`); the scan
+an application's suite holds its page's timers to, over a page of the same shape (`testing/timers.test.ts`); the setup page's screens, its keyboard ring and
 the cases where the program cannot be reached (`web/setup`, over the page's own files loaded into
 jsdom by `setupPage.ts`). No coverage provider is installed, so no figure is claimed. An application's own suite runs the page it
 builds from the kit as a whole.
@@ -120,7 +121,8 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
   paint below full opacity, the first showing, Help and every call into the desktop going through the
   `shell.Desktop` port. Not reached: `run.go`, the one-line calls into Wails, `startup`, `listen` and
   `shutdown`, which only Wails runs.
-- **`structure` (22.2%).** Its recognisers and the contrast arithmetic are tested on their own. Its
+- **`structure` (33.6%).** Its recognisers, the contrast arithmetic and the contrast check's findings
+  are tested on their own. Its
   checks are called by `tests/structural`; every check was proved there by planting a violation
   and watching it fail; Go counts none of those calls towards this package's figure.
 
@@ -149,7 +151,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 343, plus 3 `TestMain` | 349, plus 3 `TestMain` |
+| Go test functions | 345, plus 3 `TestMain` | 351, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 21 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 

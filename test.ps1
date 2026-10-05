@@ -96,7 +96,7 @@ $measured = [ordered]@{
     './infrastructure/system'      = 100
     './infrastructure/update'      = 100
     './infrastructure/zones'       = 100
-    './structure'                  = 22
+    './structure'                  = 33
 }
 
 Write-Host 'Measuring the rest of the kit...'

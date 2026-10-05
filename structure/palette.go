@@ -10,10 +10,13 @@ import (
 	"fmt"
 	"maps"
 	"math"
+	"path/filepath"
 	"regexp"
 	"slices"
 	"strconv"
 	"testing"
+
+	"github.com/oernster/ribbonkit/domain/ribbon"
 )
 
 // Half is one half of the palette: Classic names the file stating Classic, Schemes the file stating
@@ -207,6 +210,81 @@ func luminance(colour string) (float64, error) {
 		sum += linear * luminanceWeights[index]
 	}
 	return sum, nil
+}
+
+// KitHalf is the kit's half of the palette in the kit at kitDir: theme.css states Classic,
+// colours.css every other scheme.
+func KitHalf(kitDir string) Half {
+	web := filepath.Join(kitDir, "web")
+	return Half{Classic: filepath.Join(web, "theme.css"), Schemes: filepath.Join(web, "colours.css")}
+}
+
+// Offered answers the schemes the menus offer, by name.
+func Offered() []string {
+	names := make([]string, 0, len(ribbon.Colours))
+	for _, colour := range ribbon.Colours {
+		names = append(names, string(colour))
+	}
+	return names
+}
+
+// TextTokens answers the tokens the ribbon's words are drawn in.
+func TextTokens() []string { return []string{"text", "text-muted", "problem"} }
+
+// Backgrounds answers what the ribbon's words lie on: the cell and the surface beneath it.
+func Backgrounds() []string { return []string{"cell", "surface"} }
+
+// MinContrast is WCAG 2.x's AA floor for body text (success criterion 1.4.3).
+const MinContrast = 4.5
+
+// CheckTextMeetsTheContrastFloor fails for each text token that, on any background token, in any
+// offered scheme and either theme, falls under MinContrast or cannot be read (TimeRibbon NFR-U-1,
+// WeatherRibbon NFR-U-1). halves are read together as the page cascades them.
+func CheckTextMeetsTheContrastFloor(t testing.TB, halves []Half, offered, texts, backgrounds []string) {
+	t.Helper()
+	for _, shortfall := range contrastShortfalls(t, halves, offered, texts, backgrounds) {
+		t.Error(shortfall)
+	}
+}
+
+// contrastShortfalls answers what CheckTextMeetsTheContrastFloor reports, one line each, in the
+// order offered, light before dark; none when every pair meets the floor.
+func contrastShortfalls(t testing.TB, halves []Half, offered, texts, backgrounds []string) []string {
+	t.Helper()
+	palettes := Palettes(t, halves, offered)
+	var out []string
+	for _, scheme := range offered {
+		for _, side := range []Theme{Light, Dark} {
+			for _, text := range texts {
+				for _, background := range backgrounds {
+					if shortfall := shortfallOf(palettes[scheme][side], text, background); shortfall != "" {
+						out = append(out, fmt.Sprintf("%s %s --%s on --%s: %s", scheme, side, text, background, shortfall))
+					}
+				}
+			}
+		}
+	}
+	return out
+}
+
+// shortfallOf answers why text on background in colourOf misses the floor; empty when it meets it.
+func shortfallOf(colourOf Palette, text, background string) string {
+	fore, err := colourOf(text)
+	if err != nil {
+		return err.Error()
+	}
+	back, err := colourOf(background)
+	if err != nil {
+		return err.Error()
+	}
+	ratio, err := Contrast(fore, back)
+	if err != nil {
+		return err.Error()
+	}
+	if ratio < MinContrast {
+		return fmt.Sprintf("%s on %s is %.2f:1, under %.1f:1", fore, back, ratio, MinContrast)
+	}
+	return ""
 }
 
 // Contrast answers WCAG 2.x's contrast ratio between two colours, whichever is lighter.

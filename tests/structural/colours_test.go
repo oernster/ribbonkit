@@ -1,11 +1,11 @@
 package structural
 
 // The menus offer the schemes the ribbon domain lists; the kit's half of the palette (the ribbon's
-// own tokens) must state each one in full. An application holds its own half to the same rule and
-// checks the contrast of the two halves together, since only it knows what its words are drawn on.
+// own tokens) must state each one in full, its words legible on what it draws them on. An
+// application holds its own half to the same rules and checks the contrast of the two halves
+// together, since only it knows what its words are drawn on.
 
 import (
-	"path/filepath"
 	"testing"
 
 	"github.com/oernster/ribbonkit/domain/ribbon"
@@ -16,24 +16,18 @@ import (
 // on every scheme's cell and surface (TimeRibbon NFR-U-1).
 var optionalTokens = []string{"problem"}
 
-// kitHalf is the kit's half of the palette: theme.css states Classic, colours.css every other scheme.
+// kitHalf is the kit's own half of the palette.
 func kitHalf(t *testing.T) structure.Half {
 	t.Helper()
-	web := filepath.Join(structure.Root(t), webDir)
-	return structure.Half{Classic: filepath.Join(web, "theme.css"), Schemes: filepath.Join(web, "colours.css")}
-}
-
-// offered answers the schemes the menus offer, by name.
-func offered() []string {
-	names := make([]string, 0, len(ribbon.Colours))
-	for _, colour := range ribbon.Colours {
-		names = append(names, string(colour))
-	}
-	return names
+	return structure.KitHalf(structure.Root(t))
 }
 
 func TestEveryOfferedSchemeHasItsOwnCompleteBlock(t *testing.T) {
-	structure.CheckEveryOfferedSchemeHasItsOwnCompleteBlock(t, kitHalf(t), string(ribbon.Classic), offered(), optionalTokens)
+	structure.CheckEveryOfferedSchemeHasItsOwnCompleteBlock(t, kitHalf(t), string(ribbon.Classic), structure.Offered(), optionalTokens)
+}
+
+func TestTheKitsTextMeetsTheContrastFloor(t *testing.T) {
+	structure.CheckTextMeetsTheContrastFloor(t, []structure.Half{kitHalf(t)}, structure.Offered(), structure.TextTokens(), structure.Backgrounds())
 }
 
 // The page shows the system's dark under System and the chosen dark under Dark (FR-606).

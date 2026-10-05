@@ -36,6 +36,35 @@ func TestLineCountCountsTheLinesAnEditorShows(t *testing.T) {
 	}
 }
 
+// A pair under the floor is reported, as is a token neither the scheme nor Classic states; a pair
+// that meets it is not. #777 on #fff is 4.48:1, just under; #888 on #000 is 6.26:1.
+func TestAContrastShortfallIsReported(t *testing.T) {
+	dir := t.TempDir()
+	classic := filepath.Join(dir, "theme.css")
+	schemes := filepath.Join(dir, "colours.css")
+	files := map[string]string{
+		classic: ":root {\n  --text: #000;\n  --cell: #fff;\n}\n:root[data-theme='dark'] {\n  --text: #fff;\n  --cell: #000;\n}\n",
+		schemes: ":root[data-colour='dim'] {\n  --text: light-dark(#777, #888);\n}\n",
+	}
+	for path, text := range files {
+		if err := os.WriteFile(path, []byte(text), 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	half := Half{Classic: classic, Schemes: schemes}
+	got := contrastShortfalls(t, []Half{half}, []string{"classic", "dim"}, []string{"text", "absent"}, []string{"cell"})
+	want := []string{
+		"classic light --absent on --cell: --absent is stated by neither classic nor Classic",
+		"classic dark --absent on --cell: --absent is stated by neither classic nor Classic",
+		"dim light --text on --cell: #777 on #fff is 4.48:1, under 4.5:1",
+		"dim light --absent on --cell: --absent is stated by neither dim nor Classic",
+		"dim dark --absent on --cell: --absent is stated by neither dim nor Classic",
+	}
+	if !slices.Equal(got, want) {
+		t.Errorf("shortfalls:\n%q\nwant:\n%q", got, want)
+	}
+}
+
 // A file's layer and an import's are read from where they sit, in a repository whose layers are
 // under a folder and in one whose layers are at its root.
 func TestLayersAreReadFromWhereThingsSit(t *testing.T) {
