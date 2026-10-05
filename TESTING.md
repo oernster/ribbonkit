@@ -127,22 +127,27 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 
-With the platform's tags in `TAGS`, run each and read its exit code:
+With the platform's tags in `TAGS` and the kit's own folders in `KIT` (`./...` would also reach a Go
+package an npm dependency ships under `node_modules`), run each and read its exit code:
 
 ```bash
-test -z "$(gofmt -l . | grep -v node_modules)"
+export KIT="./application/... ./domain/... ./infrastructure/... ./installer/... ./structure/... ./tests/... ./ui/..."
 ```
 
 ```bash
-go vet -tags "$TAGS" ./...
+test -z "$(gofmt -l application domain infrastructure installer structure tests ui)"
 ```
 
 ```bash
-go run honnef.co/go/tools/cmd/staticcheck@v0.8.1 -tags "$TAGS" ./...
+go vet -tags "$TAGS" $KIT
 ```
 
 ```bash
-go test -count=1 -tags "$TAGS" ./...
+go run honnef.co/go/tools/cmd/staticcheck@v0.8.1 -tags "$TAGS" $KIT
+```
+
+```bash
+go test -count=1 -tags "$TAGS" $KIT
 ```
 
 ```bash
