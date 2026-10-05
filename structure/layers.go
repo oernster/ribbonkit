@@ -187,10 +187,15 @@ func (l Layout) CheckWailsStaysOutOfInfrastructure(t testing.TB, files []string)
 }
 
 // CheckCompositionRootIsWhitelisted fails for each shipped file outside CompositionRoot importing
-// both an application and an infrastructure package.
+// both an application and an infrastructure package. A file in the infrastructure layer is passed
+// over: it is an adapter implementing the application's ports, which may build on other
+// infrastructure, not the wiring of one to the other.
 func (l Layout) CheckCompositionRootIsWhitelisted(t testing.TB, files []string) {
 	t.Helper()
 	for _, path := range Shipped(files) {
+		if l.LayerOf(path) == Infrastructure {
+			continue
+		}
 		var application, infrastructure bool
 		for _, imported := range ImportsOf(t, path) {
 			application = application || l.ImportLayer(imported) == Application

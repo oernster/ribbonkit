@@ -6,19 +6,44 @@ package atomicfile
 import (
 	"errors"
 	"fmt"
+	"math"
 	"os"
 	"path/filepath"
+	"strconv"
 )
 
-// tempSuffix ends the name of the temporary file a write goes through before it replaces the real one.
-const tempSuffix = ".tmp"
+// The temporary file a write goes through is named tempPrefix, the real name, tempSeparator, the
+// random part os.CreateTemp puts where randomMarker stands, then tempSuffix: ".settings.json.123.tmp".
+const (
+	tempPrefix    = "."
+	tempSeparator = "."
+	randomMarker  = "*"
+	tempSuffix    = ".tmp"
+)
+
+// nameLimit is the longest file name NTFS, APFS and ext4 each allow, in bytes of ASCII.
+const nameLimit = 255
+
+// tempPattern answers the os.CreateTemp pattern for a write replacing base.
+func tempPattern(base string) string {
+	return tempPrefix + base + tempSeparator + randomMarker + tempSuffix
+}
+
+// MaxNameLength answers the longest name, in bytes of ASCII, a file Write replaces may have: the
+// name limit less what the temporary name adds. os.CreateTemp's random part is a uint32 in decimal,
+// so it is at most as long as math.MaxUint32 written out.
+func MaxNameLength() int {
+	longestRandom := strconv.FormatUint(math.MaxUint32, 10)
+	return nameLimit - (len(tempPattern("")) - len(randomMarker) + len(longestRandom))
+}
 
 // Write replaces path with data: written to a temporary file in the same folder, flushed to the
 // disk, given mode, then renamed over path. On any failure the temporary file is removed and path is
-// left as it was. The folder must already exist.
+// left as it was. The folder must already exist; a name longer than MaxNameLength is refused by the
+// file system.
 func Write(path string, data []byte, mode os.FileMode) error {
 	dir, base := filepath.Split(path)
-	temp, err := os.CreateTemp(dir, "."+base+".*"+tempSuffix)
+	temp, err := os.CreateTemp(dir, tempPattern(base))
 	if err != nil {
 		return fmt.Errorf("writing beside %s: %w", path, err)
 	}

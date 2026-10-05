@@ -29,7 +29,7 @@ mechanics in `structure` ([below](#outside-the-layers)); a guard not listed here
 | The UI imports no infrastructure, its tests included: it reaches the desktop through `shell.Desktop` | `TestTheUIDependsOnTheApplicationOnly` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Neither application nor infrastructure imports the UI | `TestNothingBelowTheUIImportsIt` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Infrastructure never imports Wails | `TestWailsStaysOutOfInfrastructure` | [`boundary_test.go`](tests/structural/boundary_test.go) |
-| Nothing in the kit imports both application and infrastructure: each application wires the kit in its own composition root | `TestNothingWiresTheApplicationToTheInfrastructure` | [`boundary_test.go`](tests/structural/boundary_test.go) |
+| Nothing in the kit outside infrastructure imports both application and infrastructure: each application wires the kit in its own composition root. An infrastructure file importing both is an adapter implementing a port, not wiring | `TestNothingWiresTheApplicationToTheInfrastructure` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | No source file exceeds 400 lines: Go, the web half's TypeScript and CSS, the setup page | `TestNoFileExceedsLineLimit` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | No source file sits in the danger band of 381 to 400 lines | `TestNoFileInDangerBand` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Every exported type carries a doc comment | `TestEveryExportedTypeIsDocumented` | [`boundary_test.go`](tests/structural/boundary_test.go) |
@@ -86,10 +86,12 @@ no test watches for that.
   - `release`: the update check's rules over a `Source` (FR-509).
   - `shell`: the desktop port, `shell.Desktop`, which `desktop` implements.
 - **Infrastructure.** On every platform `system` (wall clock, ids), `update`, `iconscale` and
-  `atomicfile` (a file replaced whole, every file a ribbon keeps written through it); per
+  `atomicfile` (a file replaced whole, every file a ribbon keeps written through it, with the
+  longest name it can replace); per
   platform `monitors`, `startup`, `appdata`, `runlog`, `desktop` (tray, native menus, the ribbon's
   window, the end of a move, the desktop's broadcasts, the pointer, the browser opener) and
-  `occupancy` (the folder every running ribbon shares). Windows only: `setup`, the install policy.
+  `occupancy` (the folder every running ribbon shares). Windows only: `setup`, the install policy;
+  `heldfile`, a file held open with no sharing, which only tests import.
   Linux only: `gtkmain`. macOS only: `cocoamain`.
 - **UI**: `window`, the ribbon's window as the page and the desktop see it.
 

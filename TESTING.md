@@ -29,25 +29,25 @@ figure with the fraction dropped, so it fails once cover is lost.
 |---|---|---|
 | `domain/hover`, `localtime`, `placement`, `ribbon` | 100% | 100% |
 | `application/arranger`, `menus`, `release` | 100% | 100% |
-| `infrastructure/appdata`, `iconscale`, `system`, `update` | 100% | 100% |
+| `infrastructure/appdata`, `heldfile`, `iconscale`, `system`, `update` | 100% | 100% |
 | `ui/window` | 93.8% | 93% |
 | `infrastructure/occupancy` | 90.1% | 90% |
 | `infrastructure/setup` | 84.5% | 84% |
-| `infrastructure/atomicfile` | 83.3% | 83% |
+| `infrastructure/atomicfile` | 85.7% | 85% |
 | `infrastructure/monitors` | 82.6% | 82% |
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
 | `infrastructure/desktop` | 46.8% | 46% |
-| `structure` | 22.3% | 22% |
+| `structure` | 22.2% | 22% |
 | `installer` | 11.8% | 11% |
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 323 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 326 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 296 and the Linux build 301 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 297 and the Linux build 302 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -89,9 +89,12 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
   menus as drawn, the broadcasts and a browser opening are checked by hand in an application's real
   build.
 - **`monitors` (82.6%):** Windows refusing to enumerate or describe a display.
-- **`atomicfile` (83.3%).** Tested over a temporary folder: a file written whole then replaced whole,
-  no folder, a replace refused with the temporary file removed. Not reached: the disk failing to
+- **`atomicfile` (85.7%).** Tested over a temporary folder: a file written whole then replaced whole,
+  no folder, a replace refused with the temporary file removed, the longest name its temporary name
+  allows written while the file system's own limit is refused. Not reached: the disk failing to
   take the bytes, flush them, close the file or set its mode.
+- **`heldfile` (100%, Windows only).** Exists for tests: a held file can be neither read nor removed
+  until it is let go; a missing file or an impossible path cannot be held.
 - **`occupancy` (90.1%).** Tested over a temporary folder with two products' places in it, each lock
   a real one: what one holds the other sees, a closed or crashed ribbon's entry passed over and
   removed, an entry that cannot be believed said once, a second copy holding nothing, no folder at
@@ -105,7 +108,7 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
   paint below full opacity, the first showing, Help and every call into the desktop going through the
   `shell.Desktop` port. Not reached: `run.go`, the one-line calls into Wails, `startup`, `listen` and
   `shutdown`, which only Wails runs.
-- **`structure` (22.3%).** Its recognisers and the contrast arithmetic are tested on their own. Its
+- **`structure` (22.2%).** Its recognisers and the contrast arithmetic are tested on their own. Its
   checks are called by `tests/structural`; every check was proved there by planting a violation
   and watching it fail; Go counts none of those calls towards this package's figure.
 
@@ -128,7 +131,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 296, plus 3 `TestMain` | 301, plus 3 `TestMain` |
+| Go test functions | 297, plus 3 `TestMain` | 302, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 

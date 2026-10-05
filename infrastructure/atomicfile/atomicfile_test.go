@@ -54,6 +54,21 @@ func TestAFailedReplaceLeavesNoTemporaryFile(t *testing.T) {
 	}
 }
 
+// The longest name the temporary name allows is written, whatever random part it draws; the longest
+// the file system allows is not, since its temporary name is longer still.
+func TestTheLongestNameIsWrittenAndNoLonger(t *testing.T) {
+	t.Parallel()
+	dir := t.TempDir()
+	for range 20 {
+		if err := Write(filepath.Join(dir, strings.Repeat("a", MaxNameLength())), nil, 0o600); err != nil {
+			t.Fatal(err)
+		}
+	}
+	if err := Write(filepath.Join(dir, strings.Repeat("b", nameLimit)), nil, 0o600); err == nil {
+		t.Error("a name the temporary name cannot extend was written")
+	}
+}
+
 // entries answers the names in dir.
 func entries(t *testing.T, dir string) []string {
 	t.Helper()
