@@ -20,6 +20,7 @@ const (
 	menuCheckmark             = "checkmark"
 	menuToggleState           = "toggle-state"
 	menuClicked               = "clicked"
+	menuEnabled               = "enabled"
 	menuToggleOn        int32 = 1
 	menuToggleOff       int32 = 0
 )
@@ -60,6 +61,9 @@ func childrenOf(items []menus.Item, next *int32, actions map[int32]menus.Action)
 			node.Children = childrenOf(item.Children, next, actions)
 		} else {
 			actions[node.ID] = item.Action
+			if item.Disabled {
+				node.Properties[menuEnabled] = dbus.MakeVariant(false)
+			}
 			if item.Checkable {
 				node.Properties[menuToggleType] = dbus.MakeVariant(menuCheckmark)
 				node.Properties[menuToggleState] = dbus.MakeVariant(toggleState(item.Checked))

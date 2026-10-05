@@ -39,6 +39,24 @@ func EdgeOf(action Action) (placement.Edge, bool) {
 	return edge, ok
 }
 
+// Offered answers items as a menu offers them: each Position item disabled where moves answers false
+// for its edge, so no menu offers a press that would leave the ribbon where it stands (FR-408,
+// FR-412). Nothing else changes; items itself is left as it was.
+func Offered(items []Item, moves func(placement.Edge) bool) []Item {
+	if items == nil {
+		return nil
+	}
+	offered := make([]Item, len(items))
+	for index, item := range items {
+		if edge, ok := EdgeOf(item.Action); ok {
+			item.Disabled = !moves(edge)
+		}
+		item.Children = Offered(item.Children, moves)
+		offered[index] = item
+	}
+	return offered
+}
+
 // Item is one entry of a menu.
 type Item struct {
 	Action Action
@@ -46,6 +64,9 @@ type Item struct {
 	// Checkable items show Checked beside their label.
 	Checkable bool
 	Checked   bool
+	// Disabled items are shown greyed and cannot be chosen, as a Position item is where pressing it
+	// would leave the ribbon where it stands (Offered).
+	Disabled bool
 	// Children makes the item a submenu holding them; such an item has no action of its own.
 	Children []Item
 }

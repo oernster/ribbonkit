@@ -9,7 +9,7 @@ package desktop
 #include <stdint.h>
 void desktop_watch(void *ribbon, uintptr_t handle);
 void *menu_new(void);
-void menu_add_item(void *menu, const char *label, int checkable, int checked, int index);
+void menu_add_item(void *menu, const char *label, int checkable, int checked, int enabled, int index);
 void *menu_add_submenu(void *menu, const char *label);
 void menu_add_separator(void *menu);
 void desktop_popup(void *menu);
@@ -53,7 +53,7 @@ func build(menu unsafe.Pointer, items []menus.Item, next *int) {
 			build(sub, item.Children, next)
 			continue
 		}
-		C.menu_add_item(menu, label, truth(item.Checkable), truth(item.Checked), C.int(*next))
+		C.menu_add_item(menu, label, truth(item.Checkable), truth(item.Checked), truth(!item.Disabled), C.int(*next))
 		C.free(unsafe.Pointer(label))
 		*next++
 	}

@@ -25,6 +25,8 @@ type scriptedService struct {
 	pullOut     bool
 	menu        []menus.Item
 	settingsFor []menus.Item
+	// stuck are the edges EdgeMoves answers would not move the ribbon.
+	stuck       map[placement.Edge]bool
 	arrangement arranger.Arrangement
 	// lastEdge, when set, is what ToLastEdge answers.
 	lastEdge *arranger.Arrangement
@@ -158,6 +160,8 @@ func (s *scriptedService) ToEdge(at placement.Point, edge placement.Edge) (arran
 	s.edges = append(s.edges, edge)
 	return s.arrangement, s.arrangeErr
 }
+
+func (s *scriptedService) EdgeMoves(edge placement.Edge) bool { return !s.stuck[edge] }
 
 // ToLastEdge answers the arrangement against the last edge: lastEdge where a test set one, else the
 // scripted arrangement.

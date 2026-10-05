@@ -10,7 +10,7 @@ package desktop
 #include <gtk/gtk.h>
 void desktop_watch(GtkWindow *ribbon, guintptr handle);
 GtkWidget *menu_new(void);
-void menu_add_item(GtkWidget *menu, const char *label, gboolean checkable, gboolean checked, int index);
+void menu_add_item(GtkWidget *menu, const char *label, gboolean checkable, gboolean checked, gboolean enabled, int index);
 GtkWidget *menu_add_submenu(GtkWidget *menu, const char *label);
 void menu_add_separator(GtkWidget *menu);
 void desktop_popup(GtkWindow *ribbon, GtkWidget *menu);
@@ -55,7 +55,7 @@ func build(menu *C.GtkWidget, items []menus.Item, next *int) {
 			build(sub, item.Children, next)
 			continue
 		}
-		C.menu_add_item(menu, label, gboolean(item.Checkable), gboolean(item.Checked), C.int(*next))
+		C.menu_add_item(menu, label, gboolean(item.Checkable), gboolean(item.Checked), gboolean(!item.Disabled), C.int(*next))
 		C.free(unsafe.Pointer(label))
 		*next++
 	}

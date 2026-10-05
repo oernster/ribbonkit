@@ -58,6 +58,29 @@ func (a *Arranger) clearOfOthers(current ribbon.Choices, content Content, placed
 	return placed.At
 }
 
+// EdgeMoves answers whether putting the ribbon against edge would move it from where it was last
+// arranged, asked as ToEdge would place it and saving nothing: false where that place is the one it
+// stands in, as for a ribbon already beside another that holds the edge's centre (FR-408, FR-412).
+// True until the ribbon has been arranged and where the displays cannot be read, so the item is
+// offered and pressing it reports what went wrong.
+func (a *Arranger) EdgeMoves(edge placement.Edge) bool {
+	a.mutex.Lock()
+	last := a.last
+	a.mutex.Unlock()
+	if !last.known {
+		return true
+	}
+	monitors, err := a.displays()
+	if err != nil {
+		return true
+	}
+	current, content := a.read()
+	monitor := mostOverlapped(monitors, last.at)
+	size, _, _ := ribbonSize(current, content, a.sizingOf(current), monitor)
+	placed := placement.Placed{At: placement.AgainstEdge(size, monitor.Work, edge), Monitor: monitor}
+	return a.clearOfOthers(current, content, placed, size) != last.at
+}
+
 // footprintOf answers what a ribbon of size at at occupies: itself, with its pull out while shown.
 func footprintOf(at placement.Point, size placement.Size, pullOut placement.Rect, shown bool) []placement.Rect {
 	parts := []placement.Rect{{Left: at.X, Top: at.Y, Right: at.X + size.Width, Bottom: at.Y + size.Height}}

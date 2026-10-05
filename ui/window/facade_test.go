@@ -9,6 +9,7 @@ import (
 
 	"github.com/oernster/ribbonkit/application/menus"
 	"github.com/oernster/ribbonkit/domain/placement"
+	"github.com/oernster/ribbonkit/domain/ribbon"
 )
 
 // Every change the page can make is followed by fitting the ribbon, whether or not it saved: a
@@ -154,6 +155,25 @@ func TestShowContextMenuShowsTheServicesMenu(t *testing.T) {
 	app.ShowContextMenu()
 	if len(seen.menus) != 1 || !reflect.DeepEqual(seen.menus[0], service.menu) {
 		t.Errorf("showed %v, want %v", seen.menus, service.menu)
+	}
+}
+
+// FR-408, FR-412: a Position item that would leave the ribbon where it stands is greyed in the
+// ribbon's menu, the tray's and Settings; the other edge stays offered.
+func TestEveryMenuGreysAPositionItemThatWouldNotMoveTheRibbon(t *testing.T) {
+	app, service, seen, _ := newTestApp(t)
+	service.stuck = map[placement.Edge]bool{placement.Right: true}
+	service.menu = []menus.Item{menus.PositionItem(ribbon.Vertical)}
+	app.ShowContextMenu()
+	offered := map[string][]menus.Item{"context": seen.menus[0], "control": (&Control{window: app}).Offered(service.menu)}
+	for name, menu := range offered {
+		greyed := map[menus.Action]bool{}
+		for _, item := range menu[0].Children {
+			greyed[item.Action] = item.Disabled
+		}
+		if want := map[menus.Action]bool{menus.LeftEdge: false, menus.RightEdge: true}; !reflect.DeepEqual(greyed, want) {
+			t.Errorf("%s: greyed %v, want %v", name, greyed, want)
+		}
 	}
 }
 

@@ -60,9 +60,10 @@ GtkWidget *menu_new(void)
     return gtk_menu_new();
 }
 
-// menu_add_item adds an item numbered index. A check item's state is set before its handler is
-// connected, since setting it emits activate, which would report a choice nobody made.
-void menu_add_item(GtkWidget *menu, const char *label, gboolean checkable, gboolean checked, int index)
+// menu_add_item adds an item numbered index, greyed where not enabled. A check item's state is set
+// before its handler is connected, since setting it emits activate, which would report a choice
+// nobody made.
+void menu_add_item(GtkWidget *menu, const char *label, gboolean checkable, gboolean checked, gboolean enabled, int index)
 {
     GtkWidget *item;
     if (checkable) {
@@ -71,6 +72,7 @@ void menu_add_item(GtkWidget *menu, const char *label, gboolean checkable, gbool
     } else {
         item = gtk_menu_item_new_with_label(label);
     }
+    gtk_widget_set_sensitive(item, enabled);
     g_object_set_data(G_OBJECT(item), MENU_INDEX_KEY, GINT_TO_POINTER(index));
     g_signal_connect(item, "activate", G_CALLBACK(on_item_activate), NULL);
     gtk_menu_shell_append(GTK_MENU_SHELL(menu), item);

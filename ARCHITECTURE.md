@@ -83,7 +83,9 @@ no test watches for that.
     host's one save path. Its lock is never held while it calls the host. Every placement ends clear
     of any other ribbon its `Neighbours` port reports, its own pull out included, else at the
     opposite edge, never while the grip is dragged; the result is then held for the others (FR-412).
-    A nil port is `NoNeighbours`, a ribbon alone.
+    A nil port is `NoNeighbours`, a ribbon alone. `EdgeMoves` asks ahead, saving nothing, whether
+    `ToEdge` would move the ribbon from where it was last arranged, so a menu can grey an edge whose
+    press would leave it where it stands.
   - `controls`: the ribbon's own use cases over the same `Host`: choosing its colour, orientation,
     theme, opacity, Always on top and the pin, a value not offered refused; start at sign-in through
     a `Startup` port; the update check and the release the user skipped. An application embeds
@@ -91,6 +93,9 @@ no test watches for that.
   - `menus`: the menu model (`Item`), the actions every ribbon offers and their items with their
     words (show or hide, Settings, Colour, Orientation, Position, Always on top, Pin, Help, Exit),
     built from the ribbon's choices. Each application lists them in its own order among its own.
+    An item may be `Disabled`; `Offered` greys each Position item whose edge would not move the
+    ribbon. The window passes its own menu through it; an application passes its tray menu and its
+    Settings choices through `Control.Offered`. Each desktop draws a disabled item greyed.
   - `release`: the update check's rules over a `Source` (FR-509).
   - `shell`: the desktop port, `shell.Desktop`, which `desktop` implements.
 - **Infrastructure.** On every platform `system` (wall clock, ids), `update`, `iconscale`, `zones`

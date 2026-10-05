@@ -59,6 +59,20 @@ func TestTheTrayMenuIsLaidOutForTheHost(t *testing.T) {
 	}
 }
 
+// FR-408, FR-412: a disabled item is marked not enabled for the host, which greys it; an enabled one
+// carries no mark, the specification's default being enabled.
+func TestADisabledTrayItemIsGreyedByTheHost(t *testing.T) {
+	t.Parallel()
+	root, _ := layoutOf([]menus.Item{{Action: menus.LeftEdge, Label: "Left"}, {Action: menus.RightEdge, Label: "Right", Disabled: true}})
+	live, greyed := root.Children[0].Value().(menuNode), root.Children[1].Value().(menuNode)
+	if _, marked := live.Properties[menuEnabled]; marked {
+		t.Errorf("an enabled item was marked %+v", live.Properties)
+	}
+	if enabled, marked := greyed.Properties[menuEnabled]; !marked || enabled.Value() != false {
+		t.Errorf("a disabled item was marked %+v", greyed.Properties)
+	}
+}
+
 // The icon is averaged down and sent alpha first, in network byte order.
 func TestTheTrayIconIsAveragedDownToARGB(t *testing.T) {
 	t.Parallel()

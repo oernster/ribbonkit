@@ -5,6 +5,7 @@ import (
 	"math"
 	"os"
 
+	"github.com/oernster/ribbonkit/application/menus"
 	"github.com/oernster/ribbonkit/domain/placement"
 )
 
@@ -70,6 +71,11 @@ func (c *Control) ExitWhen(signals <-chan os.Signal) { c.window.exitWhen(signals
 // TrayStarted records that the tray icon is up, so closing the ribbon hides it rather than ending
 // the application (FR-507).
 func (c *Control) TrayStarted() { c.window.trayUp.Store(true) }
+
+// Offered answers items as a menu or Settings offers them: each Position item greyed where pressing it
+// would leave the ribbon where it stands (FR-408, FR-412). The tray's menu and the Settings choices
+// pass through it, as the ribbon's own menu does.
+func (c *Control) Offered(items []menus.Item) []menus.Item { return c.window.offered(items) }
 
 // Visible answers whether the ribbon is shown, which the tray menu offers to change.
 func (c *Control) Visible() bool { return c.window.visible.Load() }

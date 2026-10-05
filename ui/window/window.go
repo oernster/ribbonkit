@@ -52,6 +52,8 @@ type Service interface {
 	Rearrange(at placement.Point) (arranger.Arrangement, error)
 	Moved(at placement.Point) (arranger.Arrangement, error)
 	ToEdge(at placement.Point, edge placement.Edge) (arranger.Arrangement, error)
+	// EdgeMoves answers whether ToEdge would move the ribbon from where it stands (FR-408, FR-412).
+	EdgeMoves(edge placement.Edge) bool
 	ToLastEdge(at placement.Point) (arranger.Arrangement, error)
 	Centred(at placement.Point, size placement.Size) (arranger.Arrangement, error)
 	Collapsed(full arranger.Arrangement) (arranger.Arrangement, error)

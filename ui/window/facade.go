@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/oernster/ribbonkit/application/menus"
 	"github.com/oernster/ribbonkit/domain/ribbon"
 )
 
@@ -107,7 +108,13 @@ func (a *Window) SetBackground(red, green, blue int) error {
 // it is open the ribbon does not collapse (FR-616); the desktop reports it closed.
 func (a *Window) ShowContextMenu() {
 	a.menuShown()
-	a.showMenu(a.service.ContextMenu())
+	a.showMenu(a.offered(a.service.ContextMenu()))
+}
+
+// offered answers items with each Position item greyed where pressing it would leave the ribbon where
+// it stands (menus.Offered).
+func (a *Window) offered(items []menus.Item) []menus.Item {
+	return menus.Offered(items, a.service.EdgeMoves)
 }
 
 // OpenDonation hands the donation page to the desktop's browser. The application never fetches it,

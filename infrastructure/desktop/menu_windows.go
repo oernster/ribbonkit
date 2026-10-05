@@ -77,6 +77,9 @@ func fill(menu uintptr, items []menus.Item, next *int) {
 		if item.Checkable && item.Checked {
 			flags |= mfChecked
 		}
+		if item.Disabled {
+			flags |= mfGrayed
+		}
 		_, _, _ = procAppendMenu.Call(menu, flags, uintptr(menuIDBase+*next), utf16Pointer(item.Label))
 		*next++
 	}

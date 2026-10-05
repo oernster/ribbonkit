@@ -31,24 +31,24 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `application/arranger`, `controls`, `menus`, `release` | 100% | 100% |
 | `infrastructure/appdata`, `heldfile`, `iconscale`, `system`, `update`, `zones` | 100% | 100% |
 | `infrastructure/settingsfile` | 97.3% | 97% |
-| `ui/window` | 93.8% | 93% |
+| `ui/window` | 93.9% | 93% |
 | `infrastructure/occupancy` | 90.1% | 90% |
 | `infrastructure/atomicfile` | 85.7% | 85% |
 | `infrastructure/setup` | 84.5% | 84% |
 | `infrastructure/monitors` | 82.6% | 82% |
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
-| `infrastructure/desktop` | 46.8% | 46% |
+| `infrastructure/desktop` | 49.7% | 49% |
 | `structure` | 22.2% | 22% |
 | `installer` | 11.8% | 11% |
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 359 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 365 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 329 and the Linux build 334 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 335 and the Linux build 341 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -82,8 +82,9 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
 
 ### The platform owns it
 
-- **`desktop` (46.8%).** The tray, native menus, move fence and broadcasts run on a hidden window's
-  message loop and act on the real ribbon window. Tested: menu identifier numbering, the fence's
+- **`desktop` (49.7%).** The tray, native menus, move fence and broadcasts run on a hidden window's
+  message loop and act on the real ribbon window. Tested: menu identifier numbering, a disabled item
+  greyed in a menu Windows builds and reads back, the fence's
   arithmetic, a work area at a point, the drag distance, an address Windows refuses, the clock watch,
   the window's cut (FR-913) with the pointer read against it, the cursor read for the grip and every
   operation of the `shell.Desktop` port, on a hidden window that is never shown. The loop itself, the
@@ -111,7 +112,7 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
   all. Not reached: the system refusing to open or lock a lock file, list the folder or remove an
   entry. Whether a lock held in one Flatpak is seen from another was measured by hand on Linux.
 - **`runlog` (77.8%):** the log refusing to open, its first line failing and `SetStdHandle` refusing.
-- **`ui/window` (93.8%).** The window's decisions are tested over a scripted service: which calls
+- **`ui/window` (93.9%).** The window's decisions are tested over a scripted service: which calls
   refit the ribbon, panels and their fit, the tab, the window holding and cut to the pull out, the
   menu actions and the hand-over of those the kit does not know, closing, a signal ending the run, the
   recover round each event and update check, the update watch's timing, the grip's drag, the window's
@@ -141,8 +142,8 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 329, plus 3 `TestMain` | 334, plus 3 `TestMain` |
-| Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
+| Go test functions | 335, plus 3 `TestMain` | 341, plus 3 `TestMain` |
+| Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 21 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 
 With the platform's tags in `TAGS` and the kit's own folders in `KIT` (`./...` would also reach a Go

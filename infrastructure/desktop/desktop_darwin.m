@@ -126,8 +126,8 @@ void *menu_new(void)
     return (__bridge_retained void *)menu;
 }
 
-// menu_add_item adds an item numbered index, checked or not where it can be.
-void menu_add_item(void *menu, const char *label, int checkable, int checked, int index)
+// menu_add_item adds an item numbered index, checked or not where it can be, greyed where not enabled.
+void menu_add_item(void *menu, const char *label, int checkable, int checked, int enabled, int index)
 {
     if (menuTarget == nil) {
         menuTarget = [RibbonKitMenuTarget new];
@@ -137,7 +137,7 @@ void menu_add_item(void *menu, const char *label, int checkable, int checked, in
                                            keyEquivalent:@""];
     item.target = menuTarget;
     item.tag = index;
-    item.enabled = YES;
+    item.enabled = enabled ? YES : NO;
     if (checkable) {
         item.state = checked ? NSControlStateValueOn : NSControlStateValueOff;
     }

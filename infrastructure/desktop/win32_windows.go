@@ -27,6 +27,8 @@ const (
 	nifIcon           = 0x02
 	nifTip            = 0x04
 	mfString          = 0x0000
+	mfByCommand       = 0x0000
+	mfGrayed          = 0x0001
 	mfChecked         = 0x0008
 	mfPopup           = 0x0010
 	mfSeparator       = 0x0800

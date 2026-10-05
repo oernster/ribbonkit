@@ -152,6 +152,61 @@ func TestTheRibbonHoldsWhatItOccupies(t *testing.T) {
 	}
 }
 
+// FR-408, FR-412: launched beside the other ribbon at (1744, 132), centring on the right edge would
+// clear it back to the same place, so that press would not move it; the left edge would. Asking saves
+// nothing and holds nothing.
+func TestAnEdgeWhoseCentreIsTakenDoesNotMoveARibbonAlreadyBesideIt(t *testing.T) {
+	t.Parallel()
+	r := newRig(vertical(), cells(3))
+	r.neighbours.occupy(otherRibbon)
+	if _, err := r.arranger.Launch(); err != nil {
+		t.Fatal(err)
+	}
+	saves, held := r.host.saves(), len(r.neighbours.held)
+	if r.arranger.EdgeMoves(placement.Right) || !r.arranger.EdgeMoves(placement.Left) {
+		t.Errorf("right moves %v, left %v; want false then true", r.arranger.EdgeMoves(placement.Right), r.arranger.EdgeMoves(placement.Left))
+	}
+	if r.host.saves() != saves || len(r.neighbours.held) != held {
+		t.Errorf("asking saved %d and held %d more, want none", r.host.saves()-saves, len(r.neighbours.held)-held)
+	}
+}
+
+// FR-408: a ribbon alone already centred on its edge would not move; dropped lower on that edge, it
+// would, back to the centre.
+func TestAnEdgeMovesARibbonOnlyWhereItStandsElsewhere(t *testing.T) {
+	t.Parallel()
+	r := newRig(vertical(), cells(2))
+	if _, err := r.arranger.Launch(); err != nil {
+		t.Fatal(err)
+	}
+	if r.arranger.EdgeMoves(placement.Right) {
+		t.Error("a ribbon centred on the right edge would move there, want not")
+	}
+	if _, err := r.arranger.Moved(placement.Point{X: 1744, Y: 600}); err != nil {
+		t.Fatal(err)
+	}
+	if !r.arranger.EdgeMoves(placement.Right) {
+		t.Error("a ribbon lower on the right edge would not move to its centre, want it to")
+	}
+}
+
+// FR-408: every edge is offered before the ribbon has been arranged and where the displays cannot be
+// read, so pressing it reports what went wrong.
+func TestAnEdgeIsOfferedWhereItCannotBeKnownWhetherItMoves(t *testing.T) {
+	t.Parallel()
+	r := newRig(vertical(), cells(2))
+	if !r.arranger.EdgeMoves(placement.Right) {
+		t.Error("an edge was withheld before the ribbon was arranged")
+	}
+	if _, err := r.arranger.Launch(); err != nil {
+		t.Fatal(err)
+	}
+	r.monitors.err = errPlanted
+	if !r.arranger.EdgeMoves(placement.Right) {
+		t.Error("an edge was withheld while the displays could not be read")
+	}
+}
+
 // FR-412: no neighbours given is a ribbon alone, placed where it would be with none running.
 func TestNoNeighboursIsARibbonAlone(t *testing.T) {
 	t.Parallel()
