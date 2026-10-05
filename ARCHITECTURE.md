@@ -66,7 +66,11 @@ no test watches for that.
     edge (FR-409), theme, Always on top, the pin and the pin in effect (FR-619), the stay-on-top rule
     (FR-617), the skipped release, the placement, the last edge (FR-411), the pull out's side, the
     opacity bounds (FR-622), the scale bounds and `ScaleAfter`, the scale a drag of the grip has
-    reached (FR-623).
+    reached (FR-623). Also a cell's label: trimmed, cut to `MaxLabelLength` characters, the
+    application's own default when nothing is left (`Label`).
+  - `localtime`, for ribbons that show places: a time written in 24-hour or 12-hour form (`Text`),
+    the mark naming a zone (`ZoneMark`), the next minute boundary (`NextRefresh`) and the order places
+    run in, east from Greenwich (`EastFromGreenwich`). Instants and zones arrive as arguments.
   - `hover`: told the pointer arrived or left and the time, it answers whether an unpinned ribbon is
     open and when to ask again (FR-615, FR-616).
   - `identity`: the application's names, `App{Name, AppID}`, which the kit holds none of its own.
