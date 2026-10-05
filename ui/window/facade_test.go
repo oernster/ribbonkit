@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/oernster/ribbonkit/application/menus"
+	"github.com/oernster/ribbonkit/domain/placement"
 )
 
 // Every change the page can make is followed by fitting the ribbon, whether or not it saved: a
@@ -99,6 +100,19 @@ func TestOpenPanelCentresThePanelOnTheRibbonsDisplay(t *testing.T) {
 	}
 	if len(seen.placed) != 1 || seen.placed[0].At != testArrange.At {
 		t.Errorf("placed %+v, want the centred arrangement", seen.placed)
+	}
+}
+
+// An application's own panel opens at its own size; a word the kit names a panel by stays the kit's,
+// whatever size the application gives it.
+func TestAnApplicationsOwnPanelOpensAtItsOwnSize(t *testing.T) {
+	detail := placement.Size{Width: 480, Height: 640}
+	for word, want := range map[string]placement.Size{"detail": detail, openAtAbout: testPanel} {
+		app, service, _, _ := newTestApp(t)
+		app.panels.Own = map[string]placement.Size{"detail": detail, openAtAbout: detail}
+		if err := app.OpenPanel(word); err != nil || service.centred != want {
+			t.Errorf("%s: centred %v (%v), want %v", word, service.centred, err, want)
+		}
 	}
 }
 

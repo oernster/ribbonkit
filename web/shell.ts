@@ -6,7 +6,10 @@ import { watchPixelRatio } from './pixelRatio'
 import { scrollbarThickness } from './scrollbar'
 import type { UpdateStatus } from './wire'
 
-/** The panels the window can become (CON-6); the window names each in its open-panel event. */
+/**
+ * The kit's panels the window can become (CON-6); the window names each in its open-panel event. An
+ * application may add its own, named by the words it gives the window's PanelSizes.Own.
+ */
 export type Panel = 'settings' | 'about' | 'licence' | 'update'
 export type View = 'ribbon' | Panel
 
@@ -26,13 +29,16 @@ export interface Drawn {
   opacity: number
 }
 
-/** What the shell needs of the application. Each must keep its identity from render to render. */
-export interface ShellOptions<S extends Drawn> {
+/**
+ * What the shell needs of the application, whose own panels are P. Each must keep its identity from
+ * render to render.
+ */
+export interface ShellOptions<S extends Drawn, P extends string = never> {
   calls: Pick<WindowCalls, 'openPanel' | 'closePanel' | 'setScrollbar' | 'setPixelRatio' | 'setBackground'>
   /** take answers the application's snapshot; null where Go refused, having told refused why. */
   take: (refused: Refused) => Promise<S | null>
-  /** opens names the application's own open-panel words, each with the panel it opens. */
-  opens: Record<string, Panel>
+  /** opens names the application's open-panel words, each with the panel it opens. */
+  opens: Record<string, Panel | P>
 }
 
 /**
@@ -42,10 +48,10 @@ export interface ShellOptions<S extends Drawn> {
  * draws the window in the theme, colour scheme and opacity the snapshot names (FR-606, FR-611,
  * FR-622).
  */
-export function useShell<S extends Drawn>({ calls, take, opens }: ShellOptions<S>) {
+export function useShell<S extends Drawn, P extends string = never>({ calls, take, opens }: ShellOptions<S, P>) {
   const [snapshot, setSnapshot] = useState<S | null>(null)
   const [problem, setProblem] = useState('')
-  const [view, setView] = useState<View>('ribbon')
+  const [view, setView] = useState<View | P>('ribbon')
   // at is the word the panel was opened at; update is the check's outcome the update panel shows.
   const [at, setAt] = useState('')
   const [update, setUpdate] = useState<UpdateStatus | null>(null)

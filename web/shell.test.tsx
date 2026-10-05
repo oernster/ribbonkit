@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from '@testing-library/react'
+import { act, renderHook, waitFor } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { swatchId } from './background'
 import type { Refused } from './bridge'
@@ -46,6 +46,19 @@ describe('useShell', () => {
     expect(hook.result.current.at).toBe(own)
     await fire('open-panel', 'no such word')
     expect(hook.result.current.view).toBe('settings')
+  })
+
+  it('becomes a panel of the application\'s own, asking Go for it by its word', async () => {
+    const bridge = install(windowBridge())
+    installEvents()
+    const take = vi.fn(async () => drawn)
+    const hook = renderHook(() =>
+      useShell<Drawn, 'detail'>({ calls: sampleCalls, take, opens: { detail: 'detail' } }),
+    )
+    act(() => hook.result.current.openPanel('detail'))
+    expect(hook.result.current.view).toBe('detail')
+    expect(bridge.OpenPanel).toHaveBeenCalledWith('detail')
+    await waitFor(() => expect(hook.result.current.opened).toBe(true))
   })
 
   it('carries the update check\'s outcome to the update panel (FR-509)', async () => {

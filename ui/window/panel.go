@@ -1,6 +1,7 @@
 package window
 
-// The window as a panel: Settings, About, Licence or an update check's outcome (CON-6).
+// The window as a panel: Settings, About, Licence, an update check's outcome or one of the
+// application's own (CON-6).
 
 import (
 	"fmt"
@@ -10,10 +11,13 @@ import (
 )
 
 // PanelSizes are the sizes in DIP the window opens at as a panel: Settings wide enough to lay its
-// choices side by side (FR-625), every other panel narrower, where its text reads better.
+// choices side by side (FR-625), every other panel of the kit's narrower, where its text reads better.
 type PanelSizes struct {
 	Settings placement.Size
 	Other    placement.Size
+	// Own are the application's own panels, each by the word the page names it by, such as a city's
+	// detail; nil where it has none. A word the kit names a panel by stays the kit's.
+	Own map[string]placement.Size
 }
 
 // of answers the size panel opens at, panel being the word the page names it by; a word naming no
@@ -24,6 +28,9 @@ func (p PanelSizes) of(panel string) (placement.Size, error) {
 		return p.Settings, nil
 	case openAtAbout, openAtLicence, openAtUpdate:
 		return p.Other, nil
+	}
+	if size, ok := p.Own[panel]; ok {
+		return size, nil
 	}
 	return placement.Size{}, fmt.Errorf("%w: a panel named %q", ribbon.ErrUnknownChoice, panel)
 }

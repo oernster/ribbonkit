@@ -104,7 +104,10 @@ no test watches for that.
   window, the end of a move, the desktop's broadcasts, the pointer, the browser opener) and
   `occupancy` (the folder every running ribbon shares). Windows only: `setup`, the install policy;
   `heldfile`, a file held open with no sharing, which only tests import.
-  Linux only: `gtkmain`. macOS only: `cocoamain`.
+  Linux only: `gtkmain`. macOS only: `cocoamain`. `platform` is what every composition root does
+  for its platform before the window opens: on Linux, GTK sent through X11 at import; `Prepare`, the
+  icon handed to the tray and a request to end from outside heard, on Linux and macOS; and
+  `GeneratingBindings`, true only in the run `wails build` makes to generate bindings.
 - **UI**: `window`, the ribbon's window as the page and the desktop see it.
 
 ### Outside the layers
@@ -152,7 +155,10 @@ Wails binds methods promoted from an embedded struct. What only the application 
 ## One window
 
 Wails v2 offers one window, so the ribbon and every panel share it (CON-6). Opening a panel resizes
-the window to its size in `PanelSizes`, centred on the ribbon's display within its work area;
+the window to its size in `PanelSizes`, centred on the ribbon's display within its work area. The
+kit's panels are Settings, About, Licence and the update check's; an application adds its own in
+`PanelSizes.Own` by the word its page names each by; `useShell` takes those words as its second
+type parameter. A word of the kit's stays the kit's.
 closing returns the ribbon to where it was. While a panel is open a move is not recorded and a change
 of length waits for the close.
 
