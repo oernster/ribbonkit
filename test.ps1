@@ -94,6 +94,7 @@ $measured = [ordered]@{
     './infrastructure/startup'     = 80
     './infrastructure/system'      = 100
     './infrastructure/update'      = 100
+    './infrastructure/zones'       = 100
     './structure'                  = 22
 }
 
