@@ -50,14 +50,15 @@ compiles 286 and the Linux build 291 ([On macOS and Linux](#on-macos-and-linux))
 
 ### The web half
 
-63 tests in 11 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
+96 tests in 14 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
 been drawn (`Band.test.tsx`, FR-614, FR-615); the pull out's handle (`PullOut.test.tsx`); the shell's
 panels, refreshes, theme and colour scheme (`shell.test.tsx`); the opacity and its slider
 (`opacity.test.ts`, `OpacitySlider.test.tsx`, FR-622); the corner grip (`ScaleGrip.test.tsx`,
 FR-623); Help, About and Licence and their self-reading cycle (`Help.test.tsx`,
 `autoScroll.test.ts`); a panel fitting its content (`panelFit.test.tsx`, FR-621); the background
-colour reported to Go (`background.test.ts`); the `devicePixelRatio` watch (`pixelRatio.test.ts`). No
-coverage provider is installed, so no figure is claimed. An application's own suite runs the page it
+colour reported to Go (`background.test.ts`); the `devicePixelRatio` watch (`pixelRatio.test.ts`); the setup page's screens, its keyboard ring and
+the cases where the program cannot be reached (`web/setup`, over the page's own files loaded into
+jsdom by `setupPage.ts`). No coverage provider is installed, so no figure is claimed. An application's own suite runs the page it
 builds from the kit as a whole.
 
 ## How each part is tested
@@ -107,8 +108,8 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
 ### It would change the machine
 
 - **`installer` (11.8%).** The setup window is tested for the pictures it asks for; its facade has no
-  tests ([TECH_DEBT.md](TECH_DEBT.md)). The policy beneath it is tested in `setup`; the page in an
-  application's own suite.
+  tests ([TECH_DEBT.md](TECH_DEBT.md)). The policy beneath it is tested in `setup`; the page in
+  `web/setup`.
 - **`setup` (84.5%).** Tested over temporary folders, a scratch key and real stand-in processes. Not
   reached: the real Apps list record, deleting the install folder after setup exits, COM or a shortcut
   refusing, a copy failing part way, `TakeFocus`, finding the launched ribbon and `Places`.
