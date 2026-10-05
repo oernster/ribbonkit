@@ -23,6 +23,7 @@ import (
 
 	"github.com/oernster/ribbonkit/domain/identity"
 	"github.com/oernster/ribbonkit/domain/placement"
+	"github.com/oernster/ribbonkit/infrastructure/atomicfile"
 )
 
 const (
@@ -30,7 +31,6 @@ const (
 	kitFolder   = "ribbonkit"
 	entrySuffix = ".json"
 	lockSuffix  = ".lock"
-	tempSuffix  = ".tmp"
 	// maxEntryBytes caps what is read of another ribbon's entry; a real one, two rectangles, is well
 	// under a kilobyte.
 	maxEntryBytes = 64 << 10
@@ -237,14 +237,8 @@ func (f *Folder) Hold(occupied []placement.Rect) {
 	}
 	// A struct of a string and whole numbers always marshals.
 	data, _ := json.Marshal(entry)
-	final := f.path(f.id, entrySuffix)
-	temporary := final + tempSuffix
-	if err := os.WriteFile(temporary, data, fileMode); err != nil {
+	if err := atomicfile.Write(f.path(f.id, entrySuffix), data, fileMode); err != nil {
 		f.report(fmt.Errorf("writing this ribbon's entry: %w", err))
-		return
-	}
-	if err := os.Rename(temporary, final); err != nil {
-		f.report(fmt.Errorf("replacing this ribbon's entry: %w", err))
 	}
 }
 

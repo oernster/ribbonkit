@@ -174,19 +174,18 @@ func TestWithoutAFolderARibbonIsAlone(t *testing.T) {
 	}
 }
 
-// FR-412: an entry that cannot be written or replaced is said in the log; the ribbon carries on.
+// FR-412: an entry that cannot be written is said in the log; the ribbon carries on. How a write
+// fails part way is atomicfile's to test.
 func TestAnEntryThatCannotBeWrittenIsSaid(t *testing.T) {
 	t.Parallel()
-	for name, blocked := range map[string]string{"replaced": entrySuffix, "written": entrySuffix + tempSuffix} {
-		var log strings.Builder
-		dir, _, beside := opened(t, &log)
-		if err := os.Mkdir(filepath.Join(dir, other.AppID+blocked), folderMode); err != nil {
-			t.Fatal(err)
-		}
-		beside.Hold([]placement.Rect{ribbonRect})
-		if !strings.Contains(log.String(), "occupancy:") || !strings.Contains(log.String(), "this ribbon's entry") {
-			t.Errorf("%s: logged %q", name, log.String())
-		}
+	var log strings.Builder
+	dir, _, beside := opened(t, &log)
+	if err := os.Mkdir(filepath.Join(dir, other.AppID+entrySuffix), folderMode); err != nil {
+		t.Fatal(err)
+	}
+	beside.Hold([]placement.Rect{ribbonRect})
+	if !strings.Contains(log.String(), "occupancy:") || !strings.Contains(log.String(), "this ribbon's entry") {
+		t.Errorf("logged %q", log.String())
 	}
 }
 

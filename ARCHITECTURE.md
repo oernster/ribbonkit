@@ -85,7 +85,8 @@ no test watches for that.
   - `menus`: the menu model (`Item`) and the actions every ribbon offers.
   - `release`: the update check's rules over a `Source` (FR-509).
   - `shell`: the desktop port, `shell.Desktop`, which `desktop` implements.
-- **Infrastructure.** On every platform `system` (wall clock, ids), `update` and `iconscale`; per
+- **Infrastructure.** On every platform `system` (wall clock, ids), `update`, `iconscale` and
+  `atomicfile` (a file replaced whole, every file a ribbon keeps written through it); per
   platform `monitors`, `startup`, `appdata`, `runlog`, `desktop` (tray, native menus, the ribbon's
   window, the end of a move, the desktop's broadcasts, the pointer, the browser opener) and
   `occupancy` (the folder every running ribbon shares). Windows only: `setup`, the install policy.

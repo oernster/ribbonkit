@@ -31,8 +31,9 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `application/arranger`, `menus`, `release` | 100% | 100% |
 | `infrastructure/appdata`, `iconscale`, `system`, `update` | 100% | 100% |
 | `ui/window` | 93.8% | 93% |
-| `infrastructure/occupancy` | 90.5% | 90% |
+| `infrastructure/occupancy` | 90.1% | 90% |
 | `infrastructure/setup` | 84.5% | 84% |
+| `infrastructure/atomicfile` | 83.3% | 83% |
 | `infrastructure/monitors` | 82.6% | 82% |
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
@@ -42,11 +43,11 @@ figure with the fraction dropped, so it fails once cover is lost.
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 320 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 323 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 293 and the Linux build 298 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 296 and the Linux build 301 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -88,7 +89,10 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
   menus as drawn, the broadcasts and a browser opening are checked by hand in an application's real
   build.
 - **`monitors` (82.6%):** Windows refusing to enumerate or describe a display.
-- **`occupancy` (90.5%).** Tested over a temporary folder with two products' places in it, each lock
+- **`atomicfile` (83.3%).** Tested over a temporary folder: a file written whole then replaced whole,
+  no folder, a replace refused with the temporary file removed. Not reached: the disk failing to
+  take the bytes, flush them, close the file or set its mode.
+- **`occupancy` (90.1%).** Tested over a temporary folder with two products' places in it, each lock
   a real one: what one holds the other sees, a closed or crashed ribbon's entry passed over and
   removed, an entry that cannot be believed said once, a second copy holding nothing, no folder at
   all. Not reached: the system refusing to open or lock a lock file, list the folder or remove an
@@ -124,7 +128,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 293, plus 3 `TestMain` | 298, plus 3 `TestMain` |
+| Go test functions | 296, plus 3 `TestMain` | 301, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 
