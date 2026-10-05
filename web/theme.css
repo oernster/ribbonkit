@@ -1,0 +1,41 @@
+/* Every colour of the ribbon itself, in one home: light by default, dark under the system's dark mode
+   unless a theme is chosen, dark or light when one is (FR-606). Text against --surface meets 4.5:1
+   in both themes (NFR-U-1). */
+
+:root {
+  --surface: #f6f7f9;
+  --cell: #ffffff;
+  --divider: #d5d9e0;
+  --text: #15181d;
+  --text-muted: #4a5260;
+  --accent: #1f5fbf;
+  --problem: #9a2b12;
+  --focus: #1f5fbf;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --surface: #111418;
+    --cell: #1a1e24;
+    --divider: #2d333c;
+    --text: #eef1f5;
+    --text-muted: #aab3c0;
+    --accent: #7fb0ff;
+    --problem: #ff9f85;
+    --focus: #7fb0ff;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme='dark'] {
+  --surface: #111418;
+  --cell: #1a1e24;
+  --divider: #2d333c;
+  --text: #eef1f5;
+  --text-muted: #aab3c0;
+  --accent: #7fb0ff;
+  --problem: #ff9f85;
+  --focus: #7fb0ff;
+  color-scheme: dark;
+}

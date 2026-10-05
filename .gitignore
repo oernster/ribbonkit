@@ -31,3 +31,9 @@ go.work.sum
 # Editor/IDE
 # .idea/
 # .vscode/
+
+# The web half's tools, installed by npm install
+node_modules/
+
+# Local Claude session files
+.claude/

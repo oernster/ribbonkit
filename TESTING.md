@@ -1,0 +1,200 @@
+# Testing
+
+What is tested, what is not and why the line falls where it does. Every figure was measured by the
+commands in [Running it](#running-it) when it was written; every shortfall is named with its reason.
+
+## Before the first run on Windows
+
+Some anti-virus programs quarantine a freshly built test binary in Go's scratch folder, which stops
+the suite. If a run fails with access denied or a missing file on a test binary, allow the folder
+`go env GOTMPDIR` names (the system temporary folder where it prints nothing). Install the web half's
+tools once:
+
+```powershell
+npm install
+```
+
+## The standard
+
+**A floor is a measurement, never an aspiration.** Each floor in `test.ps1` is its package's measured
+figure with the fraction dropped, so it fails once cover is lost.
+
+**A gap is named or it is closed.** An unexplained shortfall cannot be told from an oversight.
+
+## What the numbers are
+
+### Go
+
+| Package | Coverage | Floor |
+|---|---|---|
+| `domain/hover`, `placement`, `ribbon` | 100% | 100% |
+| `application/arranger`, `menus`, `release` | 100% | 100% |
+| `infrastructure/appdata`, `iconscale`, `system`, `update` | 100% | 100% |
+| `ui/window` | 93.8% | 93% |
+| `infrastructure/occupancy` | 90.5% | 90% |
+| `infrastructure/setup` | 84.5% | 84% |
+| `infrastructure/monitors` | 82.6% | 82% |
+| `infrastructure/startup` | 80.6% | 80% |
+| `infrastructure/runlog` | 77.8% | 77% |
+| `infrastructure/desktop` | 46.8% | 46% |
+| `structure` | 22.3% | 22% |
+| `installer` | 11.8% | 11% |
+
+`domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
+
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 314 Go test
+functions, counted from the test files `go list` selects, plus one `TestMain` in
+`infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
+on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
+compiles 286 and the Linux build 291 ([On macOS and Linux](#on-macos-and-linux)).
+
+### The web half
+
+63 tests in 11 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
+been drawn (`Band.test.tsx`, FR-614, FR-615); the pull out's handle (`PullOut.test.tsx`); the shell's
+panels, refreshes, theme and colour scheme (`shell.test.tsx`); the opacity and its slider
+(`opacity.test.ts`, `OpacitySlider.test.tsx`, FR-622); the corner grip (`ScaleGrip.test.tsx`,
+FR-623); Help, About and Licence and their self-reading cycle (`Help.test.tsx`,
+`autoScroll.test.ts`); a panel fitting its content (`panelFit.test.tsx`, FR-621); the background
+colour reported to Go (`background.test.ts`); the `devicePixelRatio` watch (`pixelRatio.test.ts`). No
+coverage provider is installed, so no figure is claimed. An application's own suite runs the page it
+builds from the kit as a whole.
+
+## How each part is tested
+
+| Part | Kind of test | Touches |
+|---|---|---|
+| `domain` | pure unit | nothing |
+| `application` | unit over hand-written fakes of the ports | nothing |
+| `infrastructure` | integration over temporary folders and scratch registry keys | the filesystem, `HKCU` under a scratch key, child processes, the real displays |
+| `ui/window` | unit over a scripted service, with Wails and the desktop stood in for | nothing |
+| `structure` | unit over its recognisers and arithmetic | temporary files |
+| `tests/structural` | source and AST scans over the kit | reads files |
+| `web` | component tests under jsdom over the stand-in bridge (`web/testing`) | nothing |
+
+No Go test uses a mocking library. **No test writes to the user's own settings, sign-in entry or
+Apps list** and **no test reaches the network**: the update adapter runs over a stand-in HTTP client.
+
+## What is not tested and why
+
+### The platform owns it
+
+- **`desktop` (46.8%).** The tray, native menus, move fence and broadcasts run on a hidden window's
+  message loop and act on the real ribbon window. Tested: menu identifier numbering, the fence's
+  arithmetic, a work area at a point, the drag distance, an address Windows refuses, the clock watch,
+  the window's cut (FR-913) with the pointer read against it, the cursor read for the grip and every
+  operation of the `shell.Desktop` port, on a hidden window that is never shown. The loop itself, the
+  menus as drawn, the broadcasts and a browser opening are checked by hand in an application's real
+  build.
+- **`monitors` (82.6%):** Windows refusing to enumerate or describe a display.
+- **`occupancy` (90.5%).** Tested over a temporary folder with two products' places in it, each lock
+  a real one: what one holds the other sees, a closed or crashed ribbon's entry passed over and
+  removed, an entry that cannot be believed said once, a second copy holding nothing, no folder at
+  all. Not reached: the system refusing to open or lock a lock file, list the folder or remove an
+  entry. Whether a lock held in one Flatpak is seen from another was measured by hand on Linux.
+- **`runlog` (77.8%):** the log refusing to open, its first line failing and `SetStdHandle` refusing.
+- **`ui/window` (93.8%).** The window's decisions are tested over a scripted service: which calls
+  refit the ribbon, panels and their fit, the tab, the window holding and cut to the pull out, the
+  menu actions and the hand-over of those the kit does not know, closing, a signal ending the run, the
+  recover round each event and update check, the update watch's timing, the grip's drag, the window's
+  paint below full opacity, the first showing, Help and every call into the desktop going through the
+  `shell.Desktop` port. Not reached: `run.go`, the one-line calls into Wails, `startup`, `listen` and
+  `shutdown`, which only Wails runs.
+- **`structure` (22.3%).** Its recognisers and the contrast arithmetic are tested on their own. Its
+  checks are called by `tests/structural`; every check was proved there by planting a violation
+  and watching it fail; Go counts none of those calls towards this package's figure.
+
+### It would change the machine
+
+- **`installer` (11.8%).** The setup window is tested for the pictures it asks for; its facade has no
+  tests ([TECH_DEBT.md](TECH_DEBT.md)). The policy beneath it is tested in `setup`; the page in an
+  application's own suite.
+- **`setup` (84.5%).** Tested over temporary folders, a scratch key and real stand-in processes. Not
+  reached: the real Apps list record, deleting the install folder after setup exits, COM or a shortcut
+  refusing, a copy failing part way, `TakeFocus`, finding the launched ribbon and `Places`.
+- **`startup` (80.6%):** the registry refusing to open, read, write or delete.
+
+## On macOS and Linux
+
+Their halves of infrastructure compile only there; `cocoamain`, `gtkmain`, `monitors` and `desktop`
+also need cgo against AppKit or GTK, so `test.ps1` reaches none of them. Check them on a machine of
+that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
+
+| What | macOS | Linux |
+|---|---|---|
+| Tags | `desktop,production` | `desktop,production,webkit2_41` |
+| Go test functions | 286, plus 3 `TestMain` | 291, plus 3 `TestMain` |
+| Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
+| Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
+
+With the platform's tags in `TAGS`, run each and read its exit code:
+
+```bash
+test -z "$(gofmt -l . | grep -v node_modules)"
+```
+
+```bash
+go vet -tags "$TAGS" ./...
+```
+
+```bash
+go run honnef.co/go/tools/cmd/staticcheck@v0.8.1 -tags "$TAGS" ./...
+```
+
+```bash
+go test -count=1 -tags "$TAGS" ./...
+```
+
+```bash
+npm install && npm run lint && npm run typecheck && npm test
+```
+
+staticcheck is the version `test.ps1` pins. The desktop tests open real windows, place them and read
+back where they stand; one registers a real tray or menu bar icon, so a person at the desktop sees
+windows come and go. Each Linux `TestMain` fails at once, saying so, where no display opens. These
+packages carry no coverage gate: a floor measured on one desktop would not hold on another.
+
+## Running it
+
+The whole gate:
+
+```powershell
+./test.ps1
+```
+
+It checks formatting, vet and staticcheck, runs every Go test, runs the web half's `lint`,
+`typecheck` and `test`, holds the domain and application to 100% and every other gated package to its
+floor. A missing `node_modules` stops the gate. Read the exit code: `0` means every check passed and
+every floor held.
+
+Another floor for the domain and application, for a deliberate check:
+
+```powershell
+./test.ps1 -Floor 95
+```
+
+The web half alone:
+
+```powershell
+npm test
+```
+
+One package's coverage in detail:
+
+```powershell
+go test -coverprofile=cover.out ./infrastructure/occupancy
+```
+
+```powershell
+go tool cover -func=cover.out
+```
+
+## Keeping this honest
+
+**Prove a new guard bites:** plant the violation, read the exit code, restore the file in a
+`finally`. Confirm first that the clean tree passes, so a compile error cannot pass for a guard
+biting. **Re-measure before quoting:** a figure copied forward describes a repository that no longer
+exists. **Read the exit code, never the last line.**
+
+See also [DEVELOPMENT.md](DEVELOPMENT.md), [ARCHITECTURE.md](ARCHITECTURE.md) and
+[TECH_DEBT.md](TECH_DEBT.md).

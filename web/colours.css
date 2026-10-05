@@ -1,0 +1,101 @@
+/* The colour schemes other than Classic (FR-611), whose values are theme.css's own. Each token is
+   stated once as light-dark(light, dark): the theme sets color-scheme, which picks the side, so every
+   scheme follows Light, Dark and System exactly as Classic does. A scheme's hue is carried by the
+   tokens the ribbon itself paints (surface, cell, divider and both texts), never by the accent
+   alone, which only Settings shows. Neon glows on its dark side. Text, muted text and problem text
+   meet 4.5:1 against the cell and the surface on both sides (NFR-U-1), measured when these values
+   were chosen. */
+
+:root[data-colour='neon'] {
+  --surface: light-dark(#f3f2f8, #07070c);
+  --cell: light-dark(#ffffff, #0d0d16);
+  --divider: light-dark(#f1b1f1, #2a1f45);
+  --text: light-dark(#006675, #5ff5ff);
+  --text-muted: light-dark(#aa0e90, #ff7ae6);
+  --accent: light-dark(#148500, #39ff14);
+  --problem: light-dark(#994700, #ffb454);
+  --focus: light-dark(#148500, #39ff14);
+  --glow: light-dark(transparent, rgb(95 245 255 / 70%));
+}
+
+:root[data-colour='ocean'] {
+  --surface: light-dark(#d6eff5, #072431);
+  --cell: light-dark(#eefafb, #0d3c4a);
+  --divider: light-dark(#a6d2dd, #226977);
+  --text: light-dark(#063147, #c8f9f9);
+  --text-muted: light-dark(#115a74, #64d8d4);
+  --accent: light-dark(#087a91, #20dfd2);
+  --focus: light-dark(#087a91, #20dfd2);
+}
+
+:root[data-colour='sunset'] {
+  --surface: light-dark(#fff4ee, #1a0d16);
+  --cell: light-dark(#ffffff, #26121f);
+  --divider: light-dark(#f0d2c4, #4a2238);
+  --text: light-dark(#3b1021, #ffe6d9);
+  --text-muted: light-dark(#7a3144, #f5a38a);
+  --accent: light-dark(#c2410c, #ff8c5a);
+  --focus: light-dark(#c2410c, #ff8c5a);
+}
+
+:root[data-colour='forest'] {
+  --surface: light-dark(#f1f5ee, #0c140e);
+  --cell: light-dark(#ffffff, #132017);
+  --divider: light-dark(#cbd8c2, #26392a);
+  --text: light-dark(#16261a, #e3f1dc);
+  --text-muted: light-dark(#3f5a3a, #a4c29a);
+  --accent: light-dark(#2f6b2a, #7cc46f);
+  --focus: light-dark(#2f6b2a, #7cc46f);
+}
+
+:root[data-colour='amber'] {
+  --surface: light-dark(#fcf2d5, #1d160c);
+  --cell: light-dark(#fefaeb, #2b2112);
+  --divider: light-dark(#e3cda0, #51422a);
+  --text: light-dark(#3f260d, #fde7a5);
+  --text-muted: light-dark(#724a1d, #ebb447);
+  --accent: light-dark(#aa690e, #f9b81f);
+  --focus: light-dark(#aa690e, #f9b81f);
+}
+
+:root[data-colour='ruby'] {
+  --surface: light-dark(#fae5e5, #2d0b0c);
+  --cell: light-dark(#fef4f4, #4e1214);
+  --divider: light-dark(#eab8b8, #7a292c);
+  --text: light-dark(#620e11, #ffe0e0);
+  --text-muted: light-dark(#931f1f, #ff938f);
+  --accent: light-dark(#b3191f, #f76464);
+  --focus: light-dark(#b3191f, #f76464);
+}
+
+:root[data-colour='indigo'] {
+  --surface: light-dark(#e1e4fa, #0e112f);
+  --cell: light-dark(#f4f5fe, #171d4f);
+  --divider: light-dark(#b5bbe3, #303a7e);
+  --text: light-dark(#11195f, #dbe2ff);
+  --text-muted: light-dark(#334199, #94a5f9);
+  --accent: light-dark(#2232c3, #7486fb);
+  --focus: light-dark(#2232c3, #7486fb);
+}
+
+:root[data-colour='berry'] {
+  --surface: light-dark(#f9e7f4, #250e1f);
+  --cell: light-dark(#fdf4fb, #3f1835);
+  --divider: light-dark(#e3bfda, #67325a);
+  --text: light-dark(#570f41, #ffdbf9);
+  --text-muted: light-dark(#822b6c, #f391df);
+  --accent: light-dark(#a51d83, #f764d9);
+  --focus: light-dark(#a51d83, #f764d9);
+}
+
+/* Contrast: black and white for the hardest-to-read conditions; yellow picks out the secondary text
+   on the dark side. */
+:root[data-colour='contrast'] {
+  --surface: light-dark(#ffffff, #000000);
+  --cell: light-dark(#ffffff, #000000);
+  --divider: light-dark(#000000, #ffffff);
+  --text: light-dark(#000000, #ffffff);
+  --text-muted: light-dark(#303030, #ffe94d);
+  --accent: light-dark(#0000c8, #ffe94d);
+  --focus: light-dark(#0000c8, #ffe94d);
+}

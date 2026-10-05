@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Setup</title>
+    <link rel="stylesheet" href="setup.css"/>
+</head>
+<body>
+<div class="shell">
+    <div class="head">
+        <img class="mark" src="icon.png" alt=""/>
+        <div class="who">
+            <div class="name" id="app-name"></div>
+            <div class="sub">A ribbon of clocks for the places you choose</div>
+        </div>
+        <button class="btn text" id="licence">Licence</button>
+        <button class="themebtn" id="theme"><img id="theme-icon" alt=""/></button>
+    </div>
+
+    <div class="body">
+        <section class="screen" id="screen-install">
+            <h1 id="install-title"></h1>
+            <p class="version" id="install-version"></p>
+            <p class="lead">It installs for your account only, so Windows will not ask for
+                administrator rights.</p>
+            <div class="options" id="install-options"></div>
+        </section>
+
+        <section class="screen" id="screen-update">
+            <h1 id="update-title"></h1>
+            <div class="flow">
+                <span class="from" id="update-from"></span>
+                <span class="arrow">&rarr;</span>
+                <span class="to" id="update-to"></span>
+            </div>
+            <p class="lead" id="update-lead"></p>
+            <div class="options" id="update-options"></div>
+        </section>
+
+        <section class="screen" id="screen-manage">
+            <h1 id="manage-title"></h1>
+            <p class="version" id="manage-version"></p>
+            <p class="lead">Repair puts the files back and leaves everything else alone.
+                Reinstall writes them again with the boxes below as they stand. Each box
+                takes effect as soon as it changes.</p>
+            <div class="options" id="manage-options"></div>
+        </section>
+
+        <section class="screen" id="screen-uninstall">
+            <h1 id="uninstall-title"></h1>
+            <p class="lead">This removes the application, its shortcuts, Start with Windows
+                and its entry in the Apps list. Your clocks and choices stay unless the box
+                below is ticked.</p>
+            <div class="options" id="uninstall-options"></div>
+        </section>
+
+        <section class="screen" id="screen-running">
+            <h1 id="running-title"></h1>
+            <p class="lead">It has to close before setup can go on. Closing it stops the
+                ribbon until it is started again.</p>
+        </section>
+
+        <section class="screen" id="screen-progress">
+            <h1 id="progress-title"></h1>
+            <div class="track"><div class="fill" id="progress-fill"></div></div>
+            <div class="status" id="progress-status"></div>
+        </section>
+
+        <section class="screen" id="screen-licence">
+            <pre class="licence-text" id="licence-text"></pre>
+        </section>
+
+        <section class="screen centred" id="screen-done">
+            <div class="verdict good">&#10003;</div>
+            <h1 id="done-title"></h1>
+            <p class="lead" id="done-msg"></p>
+        </section>
+
+        <section class="screen centred" id="screen-error">
+            <div class="verdict bad">&#9888;</div>
+            <h1>Something went wrong</h1>
+            <p class="lead" id="error-msg"></p>
+            <p class="lead" id="error-log"></p>
+        </section>
+    </div>
+
+    <div class="footer" id="footer"></div>
+</div>
+
+<script src="setup-ring.js"></script>
+<script src="auto-scroll.js"></script>
+<script src="setup-shell.js"></script>
+<script src="setup-routes.js"></script>
+</body>
+</html>

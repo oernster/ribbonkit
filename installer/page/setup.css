@@ -1,0 +1,320 @@
+/*
+ * The setup program's own sheet. Its colours are sampled from the application's artwork (the navy
+ * globe, its blue rim), so setup and the ribbon read as one product; light and dark name their own
+ * accent and ring, since a blue that reads on navy is weak on paper.
+ *
+ * Ring model, three states and no more: no ring at rest; a green ring while an enabled control is
+ * hovered or focused; a permanent danger ring while a control is disabled. The accent is never a
+ * ring: it carries identity, not state. Sizes are in pixels.
+ */
+:root {
+    --surface: #f3f6fb;
+    --panel: #ffffff;
+    --raised: #e2e9f4;
+    --border: #c3cfe0;
+    --text: #0b1a33;
+    --muted: #475670;
+    --accent: #254b83;
+    --accent-soft: #dbe5f3;
+    --ring: #047857;
+    --danger: #b4123a;
+    --danger-soft: #fde4e8;
+}
+
+:root[data-theme='dark'] {
+    --surface: #05132a;
+    --panel: #0b1d3b;
+    --raised: #172e56;
+    --border: #254b83;
+    --text: #e9f0fa;
+    --muted: #a3b4cc;
+    --accent: #9cc0ea;
+    --accent-soft: #1b3864;
+    --ring: #34d399;
+    --danger: #fb7185;
+    --danger-soft: #3a1422;
+}
+
+* { box-sizing: border-box; }
+
+html, body { height: 100%; margin: 0; }
+
+/* The glow is the accent made transparent, never a colour of its own. */
+body {
+    background:
+        radial-gradient(760px 420px at 50% -8%, color-mix(in srgb, var(--accent) 16%, transparent) 0%, transparent 70%),
+        var(--surface);
+    color: var(--text);
+    font: 18px/1.5 'Segoe UI', system-ui, sans-serif;
+    user-select: none;
+    overflow: hidden;
+}
+
+/* One focus indicator only: the ring. */
+:focus { outline: none; }
+
+.shell {
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    padding: 20px 26px 18px;
+}
+
+/* ------------------------------------------------------------ header */
+
+.head {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+    flex: 0 0 auto;
+}
+
+/* The mark is drawn large enough to be read across the room. */
+.mark {
+    width: 126px;
+    height: 126px;
+    flex: 0 0 auto;
+}
+
+.head .who { flex: 1 1 auto; min-width: 0; }
+
+.head .name {
+    font-size: 32px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.head .sub { font-size: 17px; color: var(--muted); }
+
+.themebtn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 64px;
+    height: 64px;
+    padding: 0;
+    border: 2px solid transparent;
+    border-radius: 12px;
+    background: var(--raised);
+    cursor: pointer;
+    flex: 0 0 auto;
+}
+
+.themebtn:enabled:hover,
+.themebtn:enabled:focus { border-color: var(--ring); }
+
+.themebtn img { width: 44px; height: 44px; }
+
+/* -------------------------------------------------------------- body */
+
+/* Safe centring: a short screen sits in the middle, while one holding more than fits starts at its
+   top. Plain centring pushed the head of an overflowing screen above the scroll's reach, measured
+   in Edge on 2026-09-27 as 1878 of a licence's 4059 pixels that no scroll could bring back. */
+.body {
+    flex: 1 1 auto;
+    display: flex;
+    flex-direction: column;
+    justify-content: safe center;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* The body is a stop only while it holds more than fits (FR-809). Its ring is drawn inside its
+   edge, so it takes no room the window was measured without. */
+.body:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: -2px;
+}
+
+.screen { display: none; }
+
+.screen.active { display: block; }
+
+h1 {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 6px;
+}
+
+p.lead, p.version {
+    color: var(--muted);
+    margin: 0 0 12px;
+}
+
+p.version { color: var(--text); }
+
+.licence-text {
+    font: 14px/1.45 Consolas, 'Cascadia Mono', monospace;
+    white-space: pre-wrap;
+    margin: 0;
+    color: var(--text);
+    user-select: text;
+}
+
+/* ----------------------------------------------------------- options */
+
+.options { margin-top: 4px; }
+
+.option {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-top: 8px;
+    padding: 5px 7px;
+    border: 2px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.option:hover,
+.option:focus-within { border-color: var(--ring); }
+
+.option input {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.check {
+    width: 24px;
+    height: 24px;
+    margin-top: 2px;
+    border-radius: 5px;
+    border: 1px solid var(--muted);
+    background: var(--panel);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
+.option input:checked + .check {
+    background: var(--accent);
+    border-color: var(--accent);
+}
+
+.check::after {
+    content: "";
+    width: 6px;
+    height: 11px;
+    border: solid var(--surface);
+    border-width: 0 2px 2px 0;
+    transform: rotate(45deg) scale(0);
+}
+
+.option input:checked + .check::after { transform: rotate(45deg) scale(1); }
+
+.option .label { display: block; }
+
+.option .hint {
+    display: block;
+    font-size: 15px;
+    color: var(--muted);
+}
+
+/* ---------------------------------------------------------- versions */
+
+.flow {
+    display: flex;
+    align-items: center;
+    gap: 11px;
+    font-size: 22px;
+    margin: 2px 0 12px;
+}
+
+.flow .from { color: var(--muted); }
+
+.flow .arrow { color: var(--accent); }
+
+.flow .to { font-weight: 700; }
+
+/* ---------------------------------------------------------- progress */
+
+.track {
+    height: 9px;
+    background: var(--raised);
+    border: 1px solid var(--border);
+    border-radius: 999px;
+    overflow: hidden;
+    margin: 16px 0 9px;
+}
+
+.fill {
+    height: 100%;
+    width: 0;
+    background: var(--accent);
+    border-radius: 999px;
+    transition: width 0.25s ease;
+}
+
+.status { color: var(--muted); font-size: 16px; }
+
+.verdict {
+    font-size: 44px;
+    line-height: 1;
+    margin-bottom: 10px;
+}
+
+.verdict.good { color: var(--ring); }
+
+.verdict.bad { color: var(--danger); }
+
+.centred { text-align: center; }
+
+/* ------------------------------------------------------------ footer */
+
+.footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    min-height: 66px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border);
+    flex: 0 0 auto;
+}
+
+.btn {
+    border: 2px solid transparent;
+    background: var(--raised);
+    color: var(--text);
+    border-radius: 9px;
+    padding: 11px 22px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+/* Every named kind states its own ring, so no kind is left without one. */
+.btn:enabled:hover,
+.btn:enabled:focus,
+.btn.primary:enabled:hover,
+.btn.primary:enabled:focus,
+.btn.danger:enabled:hover,
+.btn.danger:enabled:focus,
+.btn.text:enabled:hover,
+.btn.text:enabled:focus { border-color: var(--ring); }
+
+.btn:disabled {
+    border-color: var(--danger);
+    color: var(--muted);
+    cursor: default;
+}
+
+.btn.primary {
+    background: var(--accent-soft);
+    color: var(--accent);
+}
+
+.btn.danger {
+    background: var(--danger-soft);
+    color: var(--danger);
+}
+
+/* The licence is a word, not a picture; the theme toggle beside it is the picture. */
+.btn.text {
+    background: transparent;
+    padding: 8px 12px;
+}

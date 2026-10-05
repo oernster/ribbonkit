@@ -1,0 +1,105 @@
+/* About, Licence and the update panel (FR-607, FR-608, FR-509): the heading and Close stay in view while the body beneath
+   them reads itself (FR-609), so Close never drifts away with the text. */
+
+.panel {
+  box-sizing: border-box;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 16px 20px 0;
+  font-size: 14px;
+  user-select: text;
+}
+
+.panel header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex: none;
+}
+
+.panel h1 {
+  font-size: 20px;
+  margin: 0;
+}
+
+.panel h2 {
+  font-size: 15px;
+  margin: 18px 0 8px;
+}
+
+.panel-body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  margin-top: 12px;
+  padding-bottom: 16px;
+}
+
+/* The body is a keyboard stop because it scrolls; its ring is drawn inside its edge. */
+.panel-body:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: -2px;
+}
+
+/* The update panel's choices (FR-509), in a row beneath what was found. */
+.update-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.about-head {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* 128 DIP, the height tools/genicons.py renders app-icon.png for at four times. */
+.about-head img {
+  width: 128px;
+  height: 128px;
+}
+
+.about-head h2 {
+  margin: 12px 0 4px;
+}
+
+.about-head p {
+  margin: 2px 0;
+}
+
+.credits {
+  margin: 0;
+  padding-left: 18px;
+}
+
+.credits li {
+  margin: 4px 0;
+}
+
+.credit-name {
+  font-weight: 600;
+}
+
+/* The licence is shown exactly as written, its own line breaks kept: a line the panel wrapped again
+   left single words stranded. So nothing wraps; the type shrinks until the widest line fits, never
+   above 13px. --licence-columns is the LICENSE's widest line (a structural test holds it);
+   --licence-advance is a Consolas character's width per em, 1126 of 2048 units in consola.ttf.
+   The width is read from .licence, inside the scrolling body: the body's own width counts its
+   scroll bar, which the text cannot use (measured in Edge: 520 against 505 at a 560 panel). */
+.licence {
+  container-type: inline-size;
+}
+
+.licence-text {
+  --licence-columns: 78;
+  --licence-advance: 0.5498;
+  font-family: Consolas, 'Cascadia Mono', monospace;
+  font-size: min(13px, calc(100cqi / (var(--licence-columns) * var(--licence-advance))));
+  line-height: 1.45;
+  white-space: pre;
+  margin: 0;
+}

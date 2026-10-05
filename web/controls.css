@@ -1,0 +1,31 @@
+/* ribbonkit's controls: the corner grip and the opacity slider's value. The colours are the
+   application's palette tokens. */
+
+/* The ribbon's corner grip (FR-623): a small triangle in the corner of the ribbon, faint until the
+   pointer is on it. It is not drawn at the ribbon's scale, so it is the same size to grab at any. */
+.scale-grip {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: var(--grip-size);
+  height: var(--grip-size);
+  cursor: nwse-resize;
+  touch-action: none;
+  opacity: 0.5;
+  background: linear-gradient(135deg, transparent 50%, var(--text-muted) 50%);
+  --grip-size: 12px;
+}
+
+.scale-grip:hover {
+  opacity: 1;
+}
+
+/* The opacity's value is as wide as its widest, 100%, in figures of one width, so moving the slider
+   never reflows its group; when it did, Settings jumped 45 DIP taller and back as it was fitted to
+   the new height (FR-621, FR-622, measured 2026-10-04). */
+.opacity-value {
+  display: inline-block;
+  min-width: 5ch;
+  font-variant-numeric: tabular-nums;
+  text-align: right;
+}

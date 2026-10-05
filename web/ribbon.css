@@ -1,0 +1,102 @@
+/* ribbonkit's ribbon: the tab, the band the application draws in and the part pulled out beside it
+   with its handle. The colours are the application's palette tokens; --accent-shown and --pad and
+   --lane are set by the application (its #root and its band's sizing). */
+
+/* An unpinned ribbon's tab: the whole window in the scheme's accent (FR-614). */
+.tab {
+  height: 100%;
+  background: var(--accent-shown);
+}
+
+.ribbon {
+  display: flex;
+  box-sizing: border-box;
+  height: 100%;
+  width: 100%;
+  padding: var(--pad);
+  gap: 0;
+  cursor: default;
+}
+
+/* Both axes are stated. Hiding only one lets the browser turn the other into auto, which drew a
+   second scroll bar across the content once the first took room (measured in Edge, 2026-09-27). A
+   scrolling ribbon is made thicker by its bar in Go, so the bar never covers the content (FR-106). */
+.ribbon.horizontal {
+  flex-direction: row;
+  overflow: hidden;
+}
+
+.ribbon.vertical {
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.ribbon.horizontal.scrolls {
+  overflow-x: auto;
+}
+
+.ribbon.vertical.scrolls {
+  overflow-y: auto;
+}
+
+/* The pull out handle's lane on the side the pulled out part adjoins (FR-903): the content starts
+   past it. */
+.ribbon.lane-top {
+  padding-top: calc(var(--pad) + var(--lane));
+}
+
+.ribbon.lane-bottom {
+  padding-bottom: calc(var(--pad) + var(--lane));
+}
+
+.ribbon.lane-left {
+  padding-left: calc(var(--pad) + var(--lane));
+}
+
+.ribbon.lane-right {
+  padding-right: calc(var(--pad) + var(--lane));
+}
+
+/* The ribbon with its part pulled out (FR-902, FR-903): Go places each part in the window. */
+.surface {
+  position: relative;
+  height: 100%;
+  --handle-height: calc(48px * var(--scale, 1));
+}
+
+.surface-part {
+  position: absolute;
+}
+
+/* The pull out's handle, in the ribbon's lane on its inner edge, half way along (FR-903). Its depth
+   is the lane's, which PullOut sets; the minimums a plain button keeps are cleared, since they once
+   made a lying handle 24 deep in a 16 deep lane and it covered a clock's name. */
+.pull-out-handle {
+  position: absolute;
+  width: var(--handle-width);
+  height: var(--handle-height);
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  transform: translateY(-50%);
+  font-size: calc(10px * var(--scale, 1));
+}
+
+.pull-out-handle.right {
+  transform: translate(-100%, -50%);
+}
+
+/* Along a horizontal ribbon the handle lies on its side: the same two lengths, swapped. */
+.pull-out-handle.top,
+.pull-out-handle.bottom {
+  width: var(--handle-height);
+  height: var(--handle-width);
+}
+
+.pull-out-handle.top {
+  transform: translateX(-50%);
+}
+
+.pull-out-handle.bottom {
+  transform: translate(-50%, -100%);
+}
