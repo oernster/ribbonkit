@@ -69,8 +69,10 @@ no test watches for that.
     reached (FR-623). Also a cell's label: trimmed, cut to `MaxLabelLength` characters, the
     application's own default when nothing is left (`Label`).
   - `localtime`, for ribbons that show places: a time written in 24-hour or 12-hour form (`Text`),
-    the mark naming a zone (`ZoneMark`), the next minute boundary (`NextRefresh`) and the order places
-    run in, east from Greenwich (`EastFromGreenwich`). Instants and zones arrive as arguments.
+    the mark naming a zone (`ZoneMark`), the next minute boundary (`NextRefresh`), the order places
+    run in east from Greenwich (`EastFromGreenwich`) plus every time of a day in a format, for the
+    page to measure the widest (`TimeSamples`, over `Distinct`). Instants and zones arrive as
+    arguments.
   - `hover`: told the pointer arrived or left and the time, it answers whether an unpinned ribbon is
     open and when to ask again (FR-615, FR-616).
   - `identity`: the application's names, `App{Name, AppID}`, which the kit holds none of its own.
