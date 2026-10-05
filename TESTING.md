@@ -33,6 +33,7 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `infrastructure/settingsfile` | 97.3% | 97% |
 | `ui/window` | 93.9% | 93% |
 | `infrastructure/occupancy` | 90.1% | 90% |
+| `infrastructure/delivery` | 96.5% | 96% |
 | `infrastructure/atomicfile` | 85.7% | 85% |
 | `infrastructure/setup` | 84.5% | 84% |
 | `infrastructure/monitors` | 82.6% | 82% |
@@ -40,15 +41,15 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `infrastructure/runlog` | 77.8% | 77% |
 | `infrastructure/desktop` | 49.7% | 49% |
 | `structure` | 22.2% | 22% |
-| `installer` | 11.8% | 11% |
+| `installer` | 12.8% | 12% |
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 365 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 379 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 335 and the Linux build 341 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 343 and the Linux build 349 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -125,9 +126,15 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
 
 ### It would change the machine
 
-- **`installer` (11.8%).** The setup window is tested for the pictures it asks for; its facade has no
-  tests ([TECH_DEBT.md](TECH_DEBT.md)). The policy beneath it is tested in `setup`; the page in
-  `web/setup`.
+- **`installer` (12.8%).** The setup window is tested for the pictures it asks for and `Main` for
+  refusing pictures it cannot open; its facade has no tests ([TECH_DEBT.md](TECH_DEBT.md)) and the
+  rest of `Main` reads the real machine before opening a window. The policy beneath it is tested in
+  `setup`; the page in `web/setup`.
+- **`delivery` (96.5%).** Each command is tested over temporary folders: the version resource for an
+  application and its setup program, a version refused, the shell names with Wails' bus name, every
+  icon size, the payload's two entries, a refused packing leaving the archive that was there and every
+  missing or unknown flag. Not reached: the disk refusing to take an encoded picture or to close the
+  archive being packed.
 - **`setup` (84.5%).** Tested over temporary folders, a scratch key and real stand-in processes. Not
   reached: the real Apps list record, deleting the install folder after setup exits, COM or a shortcut
   refusing, a copy failing part way, `TakeFocus`, finding the launched ribbon and `Places`.
@@ -142,7 +149,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 335, plus 3 `TestMain` | 341, plus 3 `TestMain` |
+| Go test functions | 343, plus 3 `TestMain` | 349, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 21 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 

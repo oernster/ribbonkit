@@ -107,8 +107,12 @@ no test watches for that.
   could not read written back as found); per
   platform `monitors`, `startup`, `appdata`, `runlog`, `desktop` (tray, native menus, the ribbon's
   window, the end of a move, the desktop's broadcasts, the pointer, the browser opener) and
-  `occupancy` (the folder every running ribbon shares). Windows only: `setup`, the install policy;
-  `heldfile`, a file held open with no sharing, which only tests import.
+  `occupancy` (the folder every running ribbon shares). `delivery` is the work behind every
+  ribbon's build tools, each a whole command an application's tool hands its product's names: the
+  Windows version resource, the names the macOS and Linux scripts read (Wails' single-instance bus
+  name among them), the Linux icon theme's sizes plus the setup program's payload on Windows.
+  Windows only: `setup`, the install policy; `heldfile`, a file held open with no sharing, which
+  only tests import.
   Linux only: `gtkmain`. macOS only: `cocoamain`. `platform` is what every composition root does
   for its platform before the window opens: on Linux, GTK sent through X11 at import; `Prepare`, the
   icon handed to the tray and a request to end from outside heard, on Linux and macOS; and
@@ -136,8 +140,10 @@ no test watches for that.
   under. Each component takes only the values it draws; a module that reaches Go is handed the calls
   it needs.
 - **`installer`**, the setup program's window over `setup`: the setup page (`page/`, no build step),
-  the facade the page calls (`facade.go`) and `Run`, which opens the window. It is a program's
-  window rather than a layer and imports nothing of the kit but the install policy.
+  the facade the page calls (`facade.go`), `Run` (which opens the window) and `Main`, the whole of a
+  setup program's wiring (its step log, the machine read, the running application, the facade), so
+  an application's setup command only names its product and carries its payload and pictures. It is a
+  program's window rather than a layer and imports nothing of the kit but the install policy.
 - **`structure`**, the structural tests' mechanics: finding a repository's files, reading imports,
   counting lines and the layer, size, network, palette and wire checks over a `Layout` (its module,
   its layered folders, the modules it depends on and its composition root). The kit's own tests use
@@ -151,7 +157,8 @@ no test watches for that.
 | `update.New` | its GitHub repository as `owner/name`; the kit names none, so one product never asks after another's releases |
 | `window.New` | `window.Config`: its `window.Service` (the application's half behind the window's port), the `shell.Desktop`, the log, the panel sizes, the `window.Product` (names, window class, version, author, copyright, credits, licence text, donation address) and `Act`, which carries out a menu action the kit does not know |
 | `setup` | `setup.Product`: the `identity.App` and the publisher, from which the install folder, the executable, the shortcuts and the Apps list entry take their name |
-| `installer.Run` | the payload and the page's pictures (`installer.Pictures` names those the page asks for) |
+| `installer.Main` | `installer.Program`: the `setup.Product`, setup's own id, the ribbon's window class, the version, the payload, the page's pictures (`installer.Pictures` names those the page asks for) and `Bind`, wrapping the facade in a type named `App` in its own `main` package, the name the page reaches it by |
+| `delivery` | `delivery.About` (name, author, copyright) for the version resource; the `identity.App` and copyright line for the shell names; the `setup.Product` for the payload |
 
 The object Wails binds embeds `*window.Window`, so every exported method of the window is page API:
 Wails binds methods promoted from an embedded struct. What only the application may call is on
