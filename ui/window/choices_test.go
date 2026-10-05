@@ -2,6 +2,7 @@ package window
 
 import (
 	"errors"
+	"reflect"
 	"slices"
 	"testing"
 
@@ -39,6 +40,26 @@ func TestChooseCarriesOutOnlyTheChoicesSettingsOffers(t *testing.T) {
 		if err := app.Choose(refused); !errors.Is(err, ribbon.ErrUnknownChoice) || len(service.calls) != 0 || len(seen.acted) != 0 {
 			t.Errorf("Choose(%q) answered %v with calls %v; want it refused and nothing done", refused, err, service.calls)
 		}
+	}
+}
+
+// FR-624, FR-408: the menus' choices reach an application's snapshot as they are, a greyed item
+// greyed, nested groups nested and every list present, even an empty one, so the page never meets
+// null.
+func TestChoicesReachThePageAsTheMenusHoldThem(t *testing.T) {
+	items := []menus.Item{
+		{Label: "Position", Children: []menus.Item{{Action: "left-edge", Label: "Centre on left edge", Disabled: true}}},
+		{Action: menus.Pin, Label: "Pin ribbon", Checkable: true, Checked: true},
+	}
+	want := []ChoiceDTO{
+		{Label: "Position", Children: []ChoiceDTO{{Action: "left-edge", Label: "Centre on left edge", Disabled: true, Children: []ChoiceDTO{}}}},
+		{Action: string(menus.Pin), Label: "Pin ribbon", Checkable: true, Checked: true, Children: []ChoiceDTO{}},
+	}
+	if got := ChoicesOf(items); !reflect.DeepEqual(got, want) {
+		t.Errorf("choices %+v; want %+v", got, want)
+	}
+	if got := ChoicesOf(nil); got == nil || len(got) != 0 {
+		t.Errorf("no items answered %#v; want an empty list", got)
 	}
 }
 

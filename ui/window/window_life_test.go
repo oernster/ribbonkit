@@ -258,7 +258,7 @@ func TestACloseHidesTheRibbonOnlyWhileTheTrayIsUp(t *testing.T) {
 
 func TestNothingReachesTheWindowBeforeStartup(t *testing.T) {
 	app, _, seen, _ := newTestApp(t)
-	app.ctx = nil
+	app.ctx.Store(nil)
 	app.secondInstance()
 	app.hide()
 	app.applyAlwaysOnTop()

@@ -33,7 +33,8 @@ mechanics in `structure` ([below](#outside-the-layers)); a guard not listed here
 | No source file exceeds 400 lines: Go, the web half's TypeScript and CSS, the setup page | `TestNoFileExceedsLineLimit` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | No source file sits in the danger band of 381 to 400 lines | `TestNoFileInDangerBand` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Every exported type carries a doc comment | `TestEveryExportedTypeIsDocumented` | [`boundary_test.go`](tests/structural/boundary_test.go) |
-| The kit holds its four layers, `web`, `installer`, `structure` and `tests` and no other folder, so none escapes the layer rules | `TestTheKitHoldsOnlyItsLayersThePageAndTheSetupProgram` | [`folders_test.go`](tests/structural/folders_test.go) |
+| The kit holds its four layers, `web`, `installer`, `structure`, `tests` and `tools` and no other folder, so none escapes the layer rules | `TestTheKitHoldsOnlyItsLayersThePageAndTheSetupProgram` | [`folders_test.go`](tests/structural/folders_test.go) |
+| `tools` holds no Go, so nothing there sits outside the layer rules | `TestTheGeneratorsHoldNoGo` | [`folders_test.go`](tests/structural/folders_test.go) |
 | The setup program imports nothing of the kit but the install policy | `TestTheSetupProgramReachesOnlyTheInstallPolicy` | [`folders_test.go`](tests/structural/folders_test.go) |
 | The web half reaches nothing outside the kit and imports only its peer dependencies and its test tools | `TestTheWebHalfReachesNothingOutsideTheKit` | [`page_test.go`](tests/structural/page_test.go) |
 | No Go file outside `infrastructure/update` imports `net`, `crypto/tls` or `golang.org/x/net`; the exemption names a directory that exists (NFR-S-1) | `TestOnlyTheUpdateCheckImportsANetworkPackage` | [`network_test.go`](tests/structural/network_test.go) |
@@ -136,10 +137,14 @@ no test watches for that.
   application's snapshot, taken by a call the application passes in, routes the window's open-panel
   words to its panels, reloads on Go's refresh and draws the theme, colour scheme and opacity.
   Help, About and Licence are its panels (`Help.tsx`, `help.css`). The palette's ribbon half is
-  `theme.css` (Classic) and `colours.css` (every other scheme). `web/testing` is the stand-in bridge
+  `theme.css` (Classic) and `colours.css` (every other scheme). The menus' choices reach an
+  application's Settings as `MenuChoice` (`ChoiceDTO` and `ChoicesOf` in `ui/window/wire.go`), drawn
+  by `MenuGroup` and `MenuToggle` (`MenuChoices.tsx`). `web/testing` is the stand-in bridge
   and Go's events for an application's tests, plus `describePageTimers`, the scan holding an
-  application's whole page (the kit's half included) to its timer allow-list; `web/testing/setup.ts`
-  is the one test set-up both run under. Each component takes only the values it draws; a module that reaches Go is handed the calls
+  application's whole page (the kit's half included) to its timer allow-list, plus `choiceItem` and
+  `choiceGroup`, the menus' choices as Go sends them; `web/testing/setup.ts` is the one test set-up
+  both run under. On the Go side `ui/window/windowtest` is the recording stand-in for the window's
+  `Control` an application's facade tests run over. Each component takes only the values it draws; a module that reaches Go is handed the calls
   it needs.
 - **`installer`**, the setup program's window over `setup`: the setup page (`page/`, no build step),
   the facade the page calls (`facade.go`), `Run` (which opens the window) and `Main`, the whole of a
@@ -150,6 +155,9 @@ no test watches for that.
   counting lines and the layer, size, network, palette, contrast and wire checks over a `Layout` (its module,
   its layered folders, the modules it depends on and its composition root). The kit's own tests use
   it; so does each application, so both are held by the same code.
+- **`tools`**, the generators an application runs by hand, holding no Go: `genicons.py` writes every
+  icon an application commits from its master artwork, the application's own `tools/genicons.py`
+  finding it where Go builds the kit from and naming its button artwork.
 
 ## What an application hands in
 

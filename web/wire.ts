@@ -28,3 +28,14 @@ export interface Credit {
   licence: string
   role: string
 }
+
+/** One of the menus' choices: either a group of children or one item whose action goes back to Choose. */
+export interface MenuChoice {
+  action: string
+  label: string
+  checkable: boolean
+  checked: boolean
+  /** Greyed, as a Position item that would leave the ribbon where it stands is. */
+  disabled: boolean
+  children: MenuChoice[]
+}

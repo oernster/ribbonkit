@@ -16,7 +16,7 @@ import (
 // starts listening to the desktop. Nothing here ends the run: a failure is logged and the ribbon
 // opens wherever Wails put it.
 func (a *Window) startup(ctx context.Context) {
-	a.ctx = ctx
+	a.ctx.Store(&ctx)
 	go a.watchForUpdates(ctx)
 	ribbon, err := a.desktop.FindRibbon(a.product.WindowClass, a.product.App.Name)
 	if err != nil {
@@ -107,7 +107,7 @@ func (a *Window) act(action menus.Action) {
 		a.show()
 		a.emit(eventOpenPanel, openAtLicence)
 	case menus.Updates:
-		go a.checkForUpdate(a.ctx, true)
+		go a.checkForUpdate(a.wailsContext(), true)
 	case menus.AlwaysOnTop:
 		a.report("changing Always on top", a.SetAlwaysOnTop(!a.service.Choices().AlwaysOnTop))
 		a.emit(eventRefresh)
@@ -116,7 +116,7 @@ func (a *Window) act(action menus.Action) {
 		a.emit(eventRefresh)
 	case menus.Exit:
 		a.quitting.Store(true)
-		if a.ctx != nil {
+		if a.wailsContext() != nil {
 			a.quit()
 		}
 	default:
@@ -230,7 +230,7 @@ func (a *Window) placeLaunched() error {
 // applyAlwaysOnTop keeps the ribbon above other windows where Always on top is on; always while
 // unpinned in effect (FR-505, FR-617, FR-619).
 func (a *Window) applyAlwaysOnTop() {
-	if a.ctx != nil {
+	if a.wailsContext() != nil {
 		a.unpin.guard.Lock()
 		flush := a.unpin.full.Edge != ""
 		a.unpin.guard.Unlock()
@@ -241,7 +241,7 @@ func (a *Window) applyAlwaysOnTop() {
 // show shows the ribbon; an unpinned one as it stands, its tab while collapsed, which counts as shown
 // (FR-618), with the pointer watched for it to open.
 func (a *Window) show() {
-	if a.ctx == nil {
+	if a.wailsContext() == nil {
 		return
 	}
 	a.showWindow()
@@ -252,7 +252,7 @@ func (a *Window) show() {
 
 // hide hides the ribbon, its tab included (FR-618).
 func (a *Window) hide() {
-	if a.ctx == nil {
+	if a.wailsContext() == nil {
 		return
 	}
 	a.hideWindow()

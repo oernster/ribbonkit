@@ -4,7 +4,7 @@
 import { act } from '@testing-library/react'
 import { vi } from 'vitest'
 import { connect, windowCalls, type WindowBridge } from '../bridge'
-import type { AboutFacts } from '../wire'
+import type { AboutFacts, MenuChoice } from '../wire'
 
 export { describePageTimers, FRAME, type AllowedSite } from './timers'
 
@@ -66,6 +66,16 @@ export function installEvents() {
     }),
   }
   return (name: string, ...data: unknown[]) => act(() => handlers.get(name)?.(...data))
+}
+
+/** choiceItem stands for one of the menus' items as Go sends it: ticked or not where checked is given. */
+export function choiceItem(action: string, label: string, checked?: boolean): MenuChoice {
+  return { action, label, checkable: checked != null, checked: checked === true, disabled: false, children: [] }
+}
+
+/** choiceGroup stands for one of the menus' submenus as Go sends it. */
+export function choiceGroup(label: string, children: MenuChoice[]): MenuChoice {
+  return { action: '', label, checkable: false, checked: false, disabled: false, children }
 }
 
 /** sampleCalls are the window's calls over whatever bridge is installed, for the kit's own tests. */

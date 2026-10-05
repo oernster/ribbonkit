@@ -250,7 +250,8 @@ func newTestApp(t *testing.T) (*Window, *scriptedService, *window, *bytes.Buffer
 		Panels: PanelSizes{Settings: testSettingsPanel, Other: testPanel},
 		Act:    func(action menus.Action) { seen.acted = append(seen.acted, action) },
 	})
-	app.ctx = context.Background()
+	background := context.Background()
+	app.ctx.Store(&background)
 	app.ribbon = testRibbon
 	app.cursor = func() (placement.Point, bool) { return placement.Point{}, false }
 	app.emit = func(event string, data ...any) { seen.events = append(seen.events, emitted{event, data}) }

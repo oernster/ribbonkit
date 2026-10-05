@@ -141,7 +141,10 @@ type Window struct {
 	launch     launchShow
 	lastPlaced placedWindow
 
-	ctx       context.Context
+	// ctx is the context Wails hands startup, read through wailsContext. Startup runs on Wails'
+	// goroutine while an application's own goroutines may already be asking for a redraw, so it is
+	// held atomically.
+	ctx       atomic.Pointer[context.Context]
 	ribbon    shell.Window
 	trayUp    atomic.Bool
 	visible   atomic.Bool

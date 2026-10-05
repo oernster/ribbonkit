@@ -4,7 +4,35 @@ package window
 // Each type here is stated a second time in the page's wire.ts; a structural test compares the two,
 // since the type checker sees only the TypeScript and the marshaller sees only these.
 
-import "github.com/oernster/ribbonkit/application/release"
+import (
+	"github.com/oernster/ribbonkit/application/menus"
+	"github.com/oernster/ribbonkit/application/release"
+)
+
+// ChoiceDTO is one of the menus' choices as an application's Settings draws it, carried in its
+// snapshot: either a group of Children or one item whose Action the page hands back to Choose;
+// greyed while Disabled, as a Position item that would leave the ribbon where it stands is
+// (TimeRibbon FR-624, FR-408).
+type ChoiceDTO struct {
+	Action    string      `json:"action"`
+	Label     string      `json:"label"`
+	Checkable bool        `json:"checkable"`
+	Checked   bool        `json:"checked"`
+	Disabled  bool        `json:"disabled"`
+	Children  []ChoiceDTO `json:"children"`
+}
+
+// ChoicesOf answers the wire form of menu items, every list present so the page never meets null.
+func ChoicesOf(items []menus.Item) []ChoiceDTO {
+	out := make([]ChoiceDTO, 0, len(items))
+	for _, item := range items {
+		out = append(out, ChoiceDTO{
+			Action: string(item.Action), Label: item.Label, Checkable: item.Checkable, Checked: item.Checked,
+			Disabled: item.Disabled, Children: ChoicesOf(item.Children),
+		})
+	}
+	return out
+}
 
 // aboutDTO is what the About panel shows (FR-607).
 type aboutDTO struct {

@@ -13,6 +13,7 @@ import (
 // wirePairs names each Go wire type with the TypeScript interface stating it again.
 var wirePairs = map[string]string{
 	"aboutDTO": "AboutFacts", "creditDTO": "Credit", "updateDTO": "UpdateStatus", "Box": "Box",
+	"ChoiceDTO": "MenuChoice",
 }
 
 // The files each side of the wire and its words are stated in, from the repository's root.

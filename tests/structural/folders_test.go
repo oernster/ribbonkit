@@ -2,10 +2,10 @@ package structural
 
 // The layer rules know a file's layer by the folder it sits in. The folders that are not layers are
 // named here: web (the page's half), installer (the setup program's window over the install
-// policy, a program's composition rather than a layer), structure (the structural tests' mechanics)
-// and tests. These tests hold the kit to those folders alone, so a new one cannot escape the layer
-// rules unnoticed. They also hold the setup program to the one package of the module it is the
-// window over.
+// policy, a program's composition rather than a layer), structure (the structural tests' mechanics),
+// tests and tools (the generators an application runs by hand, which hold no Go). These tests hold
+// the kit to those folders alone, so a new one cannot escape the layer rules unnoticed. They also
+// hold the setup program to the one package of the module it is the window over.
 
 import (
 	"os"
@@ -18,11 +18,15 @@ import (
 )
 
 // kitFolders are the folders the kit may hold: its four layers, the page's half, the setup
-// program, the structural mechanics and the tests.
+// program, the structural mechanics, the tests and the hand-run generators.
 var kitFolders = []string{
 	structure.Application, structure.Domain, structure.Infrastructure, structure.UI,
-	"web", "installer", "structure", "tests",
+	"web", "installer", "structure", "tests", generators,
 }
+
+// generators is the folder of the generators an application runs by hand; it holds no Go, so
+// nothing there can sit outside the layer rules.
+const generators = "tools"
 
 // unheldFolders are folders a working copy holds that are not the kit's: git's, npm's and Claude's.
 var unheldFolders = []string{".git", "node_modules", ".claude"}
@@ -43,6 +47,15 @@ func TestTheKitHoldsOnlyItsLayersThePageAndTheSetupProgram(t *testing.T) {
 		name := entry.Name()
 		if entry.IsDir() && !slices.Contains(kitFolders, name) && !slices.Contains(unheldFolders, name) {
 			t.Errorf("%s is neither a layer nor one of the kit's named folders: the layer rules cannot see it", name)
+		}
+	}
+}
+
+func TestTheGeneratorsHoldNoGo(t *testing.T) {
+	root := structure.Root(t)
+	for _, path := range goFiles(t) {
+		if relative := structure.Relative(root, path); strings.HasPrefix(relative, generators+"/") {
+			t.Errorf("%s is Go under %s, where the layer rules do not look", relative, generators)
 		}
 	}
 }

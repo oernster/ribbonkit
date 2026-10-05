@@ -45,17 +45,17 @@ figure with the fraction dropped, so it fails once cover is lost.
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 381 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 383 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
-`infrastructure/setup`. Twenty-three are the structural tests, which read the source and are the same
+`infrastructure/setup`. Twenty-four are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 345 and the Linux build 351 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 347 and the Linux build 353 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
-102 tests in 15 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
+105 tests in 16 files under Vitest with jsdom: the ribbon's band, its tab and the report that it has
 been drawn (`Band.test.tsx`, FR-614, FR-615); the pull out's handle (`PullOut.test.tsx`); the shell's
-panels, refreshes, theme and colour scheme (`shell.test.tsx`); the opacity and its slider
+panels, refreshes, theme and colour scheme (`shell.test.tsx`); the menus' choices as Settings draws them (`MenuChoices.test.tsx`, FR-624); the opacity and its slider
 (`opacity.test.ts`, `OpacitySlider.test.tsx`, FR-622); the corner grip (`ScaleGrip.test.tsx`,
 FR-623); Help, About and Licence and their self-reading cycle (`Help.test.tsx`,
 `autoScroll.test.ts`); a panel fitting its content (`panelFit.test.tsx`, FR-621); the background
@@ -151,7 +151,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 345, plus 3 `TestMain` | 351, plus 3 `TestMain` |
+| Go test functions | 347, plus 3 `TestMain` | 353, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 21 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 
