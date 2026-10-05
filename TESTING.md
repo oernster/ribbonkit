@@ -30,10 +30,11 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `domain/hover`, `localtime`, `placement`, `ribbon` | 100% | 100% |
 | `application/arranger`, `menus`, `release` | 100% | 100% |
 | `infrastructure/appdata`, `heldfile`, `iconscale`, `system`, `update` | 100% | 100% |
+| `infrastructure/settingsfile` | 97.3% | 97% |
 | `ui/window` | 93.8% | 93% |
 | `infrastructure/occupancy` | 90.1% | 90% |
-| `infrastructure/setup` | 84.5% | 84% |
 | `infrastructure/atomicfile` | 85.7% | 85% |
+| `infrastructure/setup` | 84.5% | 84% |
 | `infrastructure/monitors` | 82.6% | 82% |
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
@@ -43,11 +44,11 @@ figure with the fraction dropped, so it fails once cover is lost.
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 326 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 345 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-two are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 297 and the Linux build 302 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 315 and the Linux build 320 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -95,6 +96,15 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
   take the bytes, flush them, close the file or set its mode.
 - **`heldfile` (100%, Windows only).** Exists for tests: a held file can be neither read nor removed
   until it is let go; a missing file or an impossible path cannot be held.
+- **`settingsfile` (97.3%).** Tested over a temporary folder through a small test product holding the
+  ribbon's choices, a value of its own and a list: no file, a file kept aside (a second never
+  replacing the first, none when every name is taken), a file that could not be read never saved
+  over (held open on Windows), unknown keys and a byte order mark kept, every choice written and
+  read, a bad value leaving its default, one bad entry leaving the rest, ids told apart, ordering by
+  position, a value that cannot be written refused. Each application's own suite proves its keys.
+  Not reached: a parsed object failing to tokenise and indenting failing on text built from valid
+  JSON, which valid input cannot produce; the system failing to look up a kept-aside name for any
+  reason but absence.
 - **`occupancy` (90.1%).** Tested over a temporary folder with two products' places in it, each lock
   a real one: what one holds the other sees, a closed or crashed ribbon's entry passed over and
   removed, an entry that cannot be believed said once, a second copy holding nothing, no folder at
@@ -131,7 +141,7 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 297, plus 3 `TestMain` | 302, plus 3 `TestMain` |
+| Go test functions | 315, plus 3 `TestMain` | 320, plus 3 `TestMain` |
 | Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 20 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 

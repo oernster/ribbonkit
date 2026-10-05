@@ -66,7 +66,7 @@ before `v1.0.0` may change what an application calls.
 | Path | What it holds |
 |---|---|
 | `domain`, `application` | the pure rules (placement, the ribbon's choices, hovering, the application's names) and the use cases over their ports (arranging the ribbon, the menus, the update check, the desktop's port) |
-| `infrastructure` | the adapters: the desktop, displays, sign-in start, the log, the data folder, the folder every running ribbon shares, a file replaced whole, the update check, the install policy and a file held open for tests; a file's platform is in its name (`_windows`, `_linux`, `_darwin`, `_unix`) |
+| `infrastructure` | the adapters: the desktop, displays, sign-in start, the log, the data folder, the folder every running ribbon shares, a file replaced whole, the settings file, the update check, the install policy and a file held open for tests; a file's platform is in its name (`_windows`, `_linux`, `_darwin`, `_unix`) |
 | `ui/window` | the ribbon's window: its life and the desktop's events, the tab, the pull out, panels, the grip, opacity, menu choices, the update check, Help, the first showing and the Wails options (`run.go`) |
 | `installer` | the setup program's window: its page (`page/`, no build step), the facade the page calls and `Run` |
 | `web`, `package.json` | the page's half, an npm package shipped as source; `web/testing` is the stand-in bridge, Go's events and the one test set-up |
