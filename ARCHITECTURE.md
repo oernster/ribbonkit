@@ -147,7 +147,8 @@ no test watches for that.
   `Control` an application's facade tests run over. Each component takes only the values it draws; a module that reaches Go is handed the calls
   it needs.
 - **`installer`**, the setup program's window over `setup`: the setup page (`page/`, no build step),
-  the facade the page calls (`facade.go`), `Run` (which opens the window) and `Main`, the whole of a
+  the facade the page calls (`facade.go`, reaching the machine, the running copies, the step log and
+  its window through ports of its own so its tests stand in for each), `Run` (which opens the window) and `Main`, the whole of a
   setup program's wiring (its step log, the machine read, the running application, the facade), so
   an application's setup command only names its product and carries its payload and pictures. It is a
   program's window rather than a layer and imports nothing of the kit but the install policy.

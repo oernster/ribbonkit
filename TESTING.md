@@ -39,13 +39,13 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `infrastructure/monitors` | 82.6% | 82% |
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
+| `installer` | 67.0% | 67% |
 | `infrastructure/desktop` | 49.7% | 49% |
 | `structure` | 33.6% | 33% |
-| `installer` | 12.8% | 12% |
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
 
-Every figure is the Windows build's, which `test.ps1` measures. That build compiles 383 Go test
+Every figure is the Windows build's, which `test.ps1` measures. That build compiles 396 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-four are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
@@ -128,10 +128,14 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
 
 ### It would change the machine
 
-- **`installer` (12.8%).** The setup window is tested for the pictures it asks for and `Main` for
-  refusing pictures it cannot open; its facade has no tests ([TECH_DEBT.md](TECH_DEBT.md)) and the
-  rest of `Main` reads the real machine before opening a window. The policy beneath it is tested in
-  `setup`; the page in `web/setup`.
+- **`installer` (67.0%).** The setup window is tested for the pictures it asks for and `Main` for
+  refusing pictures it cannot open. The facade is tested over fakes of its `Machine`, `Processes`,
+  `Log` and window: a machine that could not be read as the verdict, the route from one reading,
+  the Uninstall screen, nothing touched while the application runs, the bar over each step, a failed
+  step stopping the work, the boxes applied without the bar, closing the running copy, a program that
+  will not start, the window left alone before startup. Not reached: `Run`, which opens the window;
+  the three calls into Wails; the rest of `Main`, which reads the real machine before opening a
+  window; a launch that starts. The policy beneath it is tested in `setup`; the page in `web/setup`.
 - **`delivery` (96.5%).** Each command is tested over temporary folders: the version resource for an
   application and its setup program, a version refused, the shell names with Wails' bus name, every
   icon size, the payload's two entries, a refused packing leaving the archive that was there and every

@@ -75,7 +75,7 @@ try {
 # The rest of the kit, each package held at the number it reaches. TESTING.md names what each
 # shortfall is: error returns that only a failing disk, registry or display driver can produce; in
 # the window, the calls that reach Wails and the start, listening and stop that only Wails runs; in
-# the setup program, the facade the page calls, which has never had tests of its own; in structure,
+# the setup program, the window it opens, the calls into Wails and Main's reading of the real machine; in structure,
 # the checks themselves, which the structural suite calls and planted violations prove, while Go
 # counts only the package's own tests of its recognisers and arithmetic.
 $measured = [ordered]@{
@@ -91,7 +91,7 @@ $measured = [ordered]@{
     './infrastructure/occupancy'   = 90
     './infrastructure/setup'       = 84
     './infrastructure/delivery'    = 96
-    './installer'                  = 12
+    './installer'                  = 67
     './infrastructure/startup'     = 80
     './infrastructure/system'      = 100
     './infrastructure/update'      = 100

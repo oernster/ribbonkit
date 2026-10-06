@@ -9,17 +9,7 @@ Open items are numbered sections, so a scan for `## <number>.` tells whether the
 two standing sections at the end are unnumbered. A resolved item is deleted outright; history belongs
 in the release notes.
 
-## 1. The setup program's facade has no tests
-
-`Setup` in `installer/facade.go` is what the setup page calls. It holds a few decisions of its own:
-the route answered when the machine cannot be read, the refusal while the application is running, the
-line each act writes to the step log. None has a test; the package is gated at its measured 11%
-(TESTING.md). It reaches the machine through `setup.Machine` and `setup.Processes`, which are concrete
-types, so no test can stand in for them.
-
-Cost of leaving it: low. Every act hands straight to `infrastructure/setup`, tested at 84%; each
-decision is seen whenever setup is run by hand. Resolving it means giving the facade ports for the
-machine and the processes, which its tests then fake. Not blocked.
+There is no open technical debt.
 
 ## Looks like debt, not worth touching
 

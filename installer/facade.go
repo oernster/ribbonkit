@@ -23,6 +23,55 @@ const (
 	launchWait = 5 * time.Second
 )
 
+// Machine is what the facade asks of the machine: setup.Machine in the setup program, a fake in the
+// facade's tests.
+type Machine interface {
+	Read() (setup.Existing, error)
+	Places() setup.Places
+	InstallSteps(carried setup.Carried, choices setup.Choices) []setup.Step
+	RepairSteps(carried setup.Carried) ([]setup.Step, error)
+	UninstallSteps(forget bool) []setup.Step
+	ChoiceSteps(choices setup.Choices) []setup.Step
+}
+
+// Processes is what the facade asks of the application's running copies: setup.Processes in the
+// setup program.
+type Processes interface {
+	Running() bool
+	Refusal() error
+	Close() error
+}
+
+// Log is the step log the facade writes to: setup.StepLog in the setup program.
+type Log interface {
+	setup.Recorder
+	Path() string
+}
+
+// shell is what the facade asks of the window it runs in.
+type shell interface {
+	show()
+	progress(ProgressDTO)
+	quit()
+}
+
+// unstarted is the shell before Wails has started the window: there is nothing yet to show, report
+// to or close, so each call does nothing rather than hand Wails no context.
+type unstarted struct{}
+
+func (unstarted) show()                {}
+func (unstarted) progress(ProgressDTO) {}
+func (unstarted) quit()                {}
+
+// wailsShell is the window Wails started, reached through the context it handed startup.
+type wailsShell struct{ ctx context.Context }
+
+func (w wailsShell) show() { wailsruntime.WindowShow(w.ctx) }
+func (w wailsShell) progress(p ProgressDTO) {
+	wailsruntime.EventsEmit(w.ctx, progressEvent, p)
+}
+func (w wailsShell) quit() { wailsruntime.Quit(w.ctx) }
+
 // Config is what the setup window is built over.
 type Config struct {
 	// Product is the application this setup program installs.
@@ -32,9 +81,9 @@ type Config struct {
 	// RibbonClass is the class the application's ribbon window is created with, which setup waits
 	// for after starting it.
 	RibbonClass string
-	Machine     setup.Machine
-	Processes   setup.Processes
-	Log         *setup.StepLog
+	Machine     Machine
+	Processes   Processes
+	Log         Log
 	Carried     setup.Carried
 	Args        []string
 	PrefersDark bool
@@ -45,13 +94,13 @@ type Config struct {
 // Setup is the facade the page calls: everything it can do goes through a method here. Each one
 // hands straight to the setup package, which owns the install policy.
 type Setup struct {
-	ctx         context.Context
+	window      shell
 	product     setup.Product
 	setupID     string
 	ribbonClass string
-	machine     setup.Machine
-	processes   setup.Processes
-	log         *setup.StepLog
+	machine     Machine
+	processes   Processes
+	log         Log
 	carried     setup.Carried
 	uninstall   bool
 	prefersDark bool
@@ -61,6 +110,7 @@ type Setup struct {
 // New builds the facade. Started with -uninstall, setup opens on the Uninstall screen (FR-801).
 func New(config Config) *Setup {
 	return &Setup{
+		window:      unstarted{},
 		product:     config.Product,
 		setupID:     config.SetupID,
 		ribbonClass: config.RibbonClass,
@@ -74,7 +124,7 @@ func New(config Config) *Setup {
 	}
 }
 
-func (s *Setup) startup(ctx context.Context) { s.ctx = ctx }
+func (s *Setup) startup(ctx context.Context) { s.window = wailsShell{ctx: ctx} }
 
 // domReady gives the page the keyboard once it exists, since a cold launch can lose the race that
 // would otherwise hand it over.
@@ -82,8 +132,8 @@ func (s *Setup) domReady(context.Context) { s.TakeKeyboard() }
 
 // TakeKeyboard gives the web view the keyboard; the page calls it when it finds it has none.
 func (s *Setup) TakeKeyboard() {
-	if !setup.TakeFocus(s.setupID) && s.ctx != nil {
-		wailsruntime.WindowShow(s.ctx)
+	if !setup.TakeFocus(s.setupID) {
+		s.window.show()
 	}
 }
 
@@ -217,10 +267,10 @@ func (s *Setup) Licence() (string, error) { return setup.Licence(s.carried.Paylo
 // Quit closes the setup program.
 func (s *Setup) Quit() {
 	s.log.Record("closed")
-	wailsruntime.Quit(s.ctx)
+	s.window.quit()
 }
 
 // progress reports how far the work has got.
 func (s *Setup) progress(p setup.Progress) {
-	wailsruntime.EventsEmit(s.ctx, progressEvent, ProgressDTO{Pct: p.Percent, Msg: p.Step})
+	s.window.progress(ProgressDTO{Pct: p.Percent, Msg: p.Step})
 }
