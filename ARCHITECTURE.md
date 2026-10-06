@@ -276,6 +276,13 @@ the toolkit is written once in `_unix.go` files.
   ribbon's deliberate showing, gives it 1. The opacity is set on the GDK window, which the window
   manager reads; GTK ignores widget opacity on a top-level window with an RGBA visual until it paints
   (`veil_linux.go`).
+- **Leaving before a restart (Linux).** At a restart systemd stops GNOME Shell and the ribbon
+  together; the ribbon's window went while GNOME Shell was losing Xwayland, so GNOME Shell waited
+  for an answer that never came until it was killed (a core dump showed it handling the ribbon's
+  UnmapNotify). `Prepare` therefore takes a logind delay lock. On `PrepareForShutdown(true)` it
+  sends SIGTERM down the same path a request to end from outside takes (`shutdown_linux.go`). A
+  Flatpak needs `--system-talk-name=org.freedesktop.login1` for it; without the system bus the
+  ribbon carries on as before and says so in its log. macOS needs none of this (`shutdown_darwin.go`).
 - **Coordinates.** Both count in DIP, every display reported at `placement.BaseDPI`; AppKit's
   bottom-left origin is turned over into the domain's top-left reckoning.
 - **Placing.** macOS uses one `setFrame`. Linux sets the size and awaits it (up to 500 ms) before
