@@ -39,7 +39,7 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `infrastructure/monitors` | 82.6% | 82% |
 | `infrastructure/startup` | 80.6% | 80% |
 | `infrastructure/runlog` | 77.8% | 77% |
-| `installer` | 67.0% | 67% |
+| `installer` | 68.3% | 68% |
 | `infrastructure/desktop` | 49.7% | 49% |
 | `structure` | 33.6% | 33% |
 
@@ -128,7 +128,7 @@ Apps list** and **no test reaches the network**: the update adapter runs over a 
 
 ### It would change the machine
 
-- **`installer` (67.0%).** The setup window is tested for the pictures it asks for and `Main` for
+- **`installer` (68.3%).** The setup window is tested for the pictures it asks for and `Main` for
   refusing pictures it cannot open. The facade is tested over fakes of its `Machine`, `Processes`,
   `Log` and window: a machine that could not be read as the verdict, the route from one reading,
   the Uninstall screen, nothing touched while the application runs, the bar over each step, a failed

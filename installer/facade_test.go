@@ -115,7 +115,7 @@ func newRig(t *testing.T, args ...string) rig {
 		Carried:   setup.Carried{Version: carriedVersion},
 		Args:      args,
 	})
-	r.setup.window = r.window
+	r.setup.useWindow(r.window)
 	return r
 }
 
@@ -293,8 +293,8 @@ func TestBeforeStartupTheWindowIsLeftAlone(t *testing.T) {
 	s.TakeKeyboard()
 	s.progress(setup.Progress{Percent: 100})
 	s.startup(context.Background())
-	if _, started := s.window.(wailsShell); !started {
-		t.Errorf("after startup the window is %T; want Wails'", s.window)
+	if _, started := s.windowNow().(wailsShell); !started {
+		t.Errorf("after startup the window is %T; want Wails'", s.windowNow())
 	}
 }
 

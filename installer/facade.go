@@ -9,6 +9,7 @@ package installer
 import (
 	"context"
 	"slices"
+	"sync/atomic"
 	"time"
 
 	wailsruntime "github.com/wailsapp/wails/v2/pkg/runtime"
@@ -94,7 +95,9 @@ type Config struct {
 // Setup is the facade the page calls: everything it can do goes through a method here. Each one
 // hands straight to the setup package, which owns the install policy.
 type Setup struct {
-	window      shell
+	// window is reached through windowNow. Wails runs startup on a goroutine of its own and each bound
+	// call on another, nothing ordering the two (its Windows frontend.go), so it is held atomically.
+	window      atomic.Pointer[shell]
 	product     setup.Product
 	setupID     string
 	ribbonClass string
@@ -109,8 +112,7 @@ type Setup struct {
 
 // New builds the facade. Started with -uninstall, setup opens on the Uninstall screen (FR-801).
 func New(config Config) *Setup {
-	return &Setup{
-		window:      unstarted{},
+	s := &Setup{
 		product:     config.Product,
 		setupID:     config.SetupID,
 		ribbonClass: config.RibbonClass,
@@ -122,9 +124,17 @@ func New(config Config) *Setup {
 		prefersDark: config.PrefersDark,
 		problem:     config.Problem,
 	}
+	s.useWindow(unstarted{})
+	return s
 }
 
-func (s *Setup) startup(ctx context.Context) { s.window = wailsShell{ctx: ctx} }
+// useWindow makes window the one the facade's calls reach.
+func (s *Setup) useWindow(window shell) { s.window.Store(&window) }
+
+// windowNow answers the window the facade's calls reach.
+func (s *Setup) windowNow() shell { return *s.window.Load() }
+
+func (s *Setup) startup(ctx context.Context) { s.useWindow(wailsShell{ctx: ctx}) }
 
 // domReady gives the page the keyboard once it exists, since a cold launch can lose the race that
 // would otherwise hand it over.
@@ -133,7 +143,7 @@ func (s *Setup) domReady(context.Context) { s.TakeKeyboard() }
 // TakeKeyboard gives the web view the keyboard; the page calls it when it finds it has none.
 func (s *Setup) TakeKeyboard() {
 	if !setup.TakeFocus(s.setupID) {
-		s.window.show()
+		s.windowNow().show()
 	}
 }
 
@@ -267,10 +277,10 @@ func (s *Setup) Licence() (string, error) { return setup.Licence(s.carried.Paylo
 // Quit closes the setup program.
 func (s *Setup) Quit() {
 	s.log.Record("closed")
-	s.window.quit()
+	s.windowNow().quit()
 }
 
 // progress reports how far the work has got.
 func (s *Setup) progress(p setup.Progress) {
-	s.window.progress(ProgressDTO{Pct: p.Percent, Msg: p.Step})
+	s.windowNow().progress(ProgressDTO{Pct: p.Percent, Msg: p.Step})
 }
