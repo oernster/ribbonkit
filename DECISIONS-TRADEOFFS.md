@@ -174,16 +174,32 @@ One copy runs per user under the application's id; a second launch shows or hide
 - **Gains:** a single launcher button both shows and hides the ribbon.
 - **Costs:** a copy left running makes a newer build's first launch only toggle the old ribbon.
 
-### No taskbar button, save the Dock on macOS
+### No taskbar button, no Dock icon
 
 On Windows and Linux the window's taskbar button is removed before it is first shown. On macOS the
-Dock icon stays: making the application an accessory after Wails launched it never removed the icon
-on a real Mac.
+application becomes an accessory once Wails has finished launching it, so it has no Dock icon; its
+menu-bar icon is how it is reached.
 
-- **Rather than:** accepting the button everywhere.
-- **Gains:** the ribbon stays out of the way.
-- **Costs:** on Windows it rests on swapping Wails' window style, checked by hand on any Wails
-  upgrade; macOS keeps a Dock icon.
+- **Rather than:** accepting the button everywhere; `LSUIElement` in the bundle, which Wails
+  overrides as it launches.
+- **Gains:** the ribbon stays out of the way; no Dock Quit reaches a close handler that hides rather
+  than quits.
+- **Costs:** on Windows it rests on swapping Wails' window style and on macOS on undoing Wails'
+  activation policy, both checked by hand on any Wails upgrade; with no Dock icon there is no app
+  switcher entry either.
+
+### The early window veiled on Linux
+
+Wails puts its window on screen before GTK's main loop starts, even when told to start hidden. A
+window mapped before the loop runs is made fully transparent until it is next mapped.
+
+- **Rather than:** a smaller starting size, which GTK holds at the web view's minimum (measured: 400
+  by 400 pixels, still a black square); a transparent starting background, applied too late to change
+  the first frame; patching Wails, whose v2.16.0 has the same code.
+- **Gains:** no black window at login.
+- **Costs:** a hook on every widget's map signal for the life of the process, which does nothing
+  once the loop runs and the window is shown; it depends on Wails mapping before the loop, checked by
+  hand on any Wails upgrade.
 
 ### See-through background, solid content
 

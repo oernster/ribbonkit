@@ -36,6 +36,33 @@ void *ribbon_find(const char *title)
     return NULL;
 }
 
+// ribbon_leave_dock makes the application an accessory: no Dock icon and no place in the
+// application switcher, while its menu-bar icon stays (FR-101). Wails makes the application
+// regular in applicationWillFinishLaunching, which overrides LSUIElement and any earlier switch
+// (measured 2026-10-06), so where launching has not finished the switch is made again once it has.
+void ribbon_leave_dock(void)
+{
+    [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+    if ([[NSRunningApplication currentApplication] isFinishedLaunching]) {
+        return;
+    }
+    __block id observer = [[NSNotificationCenter defaultCenter]
+        addObserverForName:NSApplicationDidFinishLaunchingNotification
+                    object:nil
+                     queue:[NSOperationQueue mainQueue]
+                usingBlock:^(NSNotification *note) {
+        [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
+        [[NSNotificationCenter defaultCenter] removeObserver:observer];
+        observer = nil;
+    }];
+}
+
+// ribbon_skips_dock answers whether the application is an accessory, kept off the Dock.
+int ribbon_skips_dock(void)
+{
+    return [NSApp activationPolicy] == NSApplicationActivationPolicyAccessory;
+}
+
 // ribbon_place stands the window with its top-left corner at x, y at width by height.
 void ribbon_place(void *ribbon, int x, int y, int width, int height)
 {

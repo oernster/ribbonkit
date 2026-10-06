@@ -11,6 +11,8 @@ void ribbon_frame(void *ribbon, int *x, int *y, int *width, int *height);
 int ribbon_pointer_inside(void *ribbon);
 void *test_window(const char *title);
 void test_window_close(void *ribbon);
+void ribbon_leave_dock(void);
+int ribbon_skips_dock(void);
 */
 import "C"
 
@@ -40,10 +42,22 @@ func FindRibbon(_, name string) (Window, error) {
 	})
 }
 
-// HideFromTaskbar does nothing on macOS, where a ribbon keeps its Dock icon (FR-101, Amendment
-// 36): Wails makes the application a regular one as it launches; making it an accessory after that
-// never took the icon away on a real Mac.
-func HideFromTaskbar(Window) error { return nil }
+// HideFromTaskbar keeps the application off the Dock on macOS (FR-101); its menu-bar icon stays.
+// The Dock belongs to the application rather than the window, so ribbon is not used.
+func HideFromTaskbar(Window) error {
+	cocoamain.Do(func() { C.ribbon_leave_dock() })
+	return nil
+}
+
+// veilEarlyMaps does nothing on macOS, where Wails keeps a window that starts hidden off the screen.
+func veilEarlyMaps() {}
+
+// skipsTaskbar answers whether the application is kept off the Dock.
+func skipsTaskbar(Window) (bool, error) {
+	var skips bool
+	cocoamain.Do(func() { skips = C.ribbon_skips_dock() != 0 })
+	return skips, nil
+}
 
 // KeepOnDisplays does nothing on macOS, where AppKit carries a drag through and offers no say in
 // it while it lasts. A ribbon dragged partly off every display is put back when the move ends,

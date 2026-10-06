@@ -1,9 +1,11 @@
+//go:build linux || darwin
+
 package desktop
 
 import "testing"
 
-// FR-101: on Linux the ribbon is marked to stay off the taskbar and the workspace switcher. macOS
-// keeps its Dock icon (Amendment 36), so this holds for Linux alone.
+// FR-101: the ribbon stays off the taskbar. On Linux the window is marked to stay off the taskbar
+// and the workspace switcher; on macOS the application becomes an accessory, with no Dock icon.
 func TestTheRibbonIsKeptOffTheTaskbar(t *testing.T) {
 	ribbon := newTestWindow(testApp.Name)
 	defer closeTestWindow(ribbon)

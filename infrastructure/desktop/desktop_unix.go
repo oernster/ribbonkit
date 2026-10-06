@@ -51,8 +51,10 @@ type Desktop struct {
 // 2026-09-28, REQUIREMENTS section 2.3), so no style holds the window wider.
 func SetTabFrame(Window, bool) error { return nil }
 
-// New answers a desktop for app whose tray menu is menu, reporting failures to log.
+// New answers a desktop for app whose tray menu is menu, reporting failures to log. It comes before
+// Wails runs, so it is where the window Wails shows too early is veiled (veil_linux.go).
 func New(app identity.App, menu func() []menus.Item, log io.Writer) *Desktop {
+	veilEarlyMaps()
 	return &Desktop{app: app, menu: menu, events: make(chan Event, eventBuffer), log: log, stop: make(chan struct{})}
 }
 

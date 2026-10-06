@@ -260,9 +260,17 @@ the toolkit is written once in `_unix.go` files.
 - **One thread.** `gtkmain.Do` and `cocoamain.Do` run a function on the toolkit's loop and wait,
   raising a panic again on the caller.
 - **Finding and hiding (FR-101).** The ribbon is the top-level window titled with the product's name.
-  Linux marks it to skip the taskbar and switcher. macOS keeps its Dock icon: switching the
-  application to an accessory after Wails launched it never removed the icon on a real Mac, so
-  `HideFromTaskbar` does nothing there.
+  Linux marks it to skip the taskbar and switcher. macOS makes the application an accessory, with no
+  Dock icon while its menu-bar icon stays. Wails makes it a regular application in
+  `applicationWillFinishLaunching`, overriding `LSUIElement` and any earlier switch, so where
+  launching has not finished the switch is made again on `NSApplicationDidFinishLaunchingNotification`.
+- **The window Wails shows too early (Linux).** Wails maps its window with `gtk_widget_show_all`
+  before GTK's main loop starts, `StartHidden` or not; in the Flatpak it showed as a black window
+  over most of the screen at login. `New` hooks every widget's `map` signal before Wails runs: a
+  top-level window mapped while `gtk_main_level()` is 0 is given window opacity 0. Its next map, the
+  ribbon's deliberate showing, gives it 1. The opacity is set on the GDK window, which the window
+  manager reads; GTK ignores widget opacity on a top-level window with an RGBA visual until it paints
+  (`veil_linux.go`).
 - **Coordinates.** Both count in DIP, every display reported at `placement.BaseDPI`; AppKit's
   bottom-left origin is turned over into the domain's top-left reckoning.
 - **Placing.** macOS uses one `setFrame`. Linux sets the size and awaits it (up to 500 ms) before
