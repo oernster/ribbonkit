@@ -85,6 +85,8 @@ what that covers and what is checked on macOS and Linux.
 - [ARCHITECTURE.md](ARCHITECTURE.md): the layers, what each package does and the rules the tests hold.
 - [TESTING.md](TESTING.md): the gate, the floors and their reasons.
 - [DEVELOPMENT.md](DEVELOPMENT.md): working on the kit beside an application and cutting a release.
+- [DECISIONS-TRADEOFFS.md](DECISIONS-TRADEOFFS.md): the decisions the kit rests on, with what each
+  costs.
 - [TECH_DEBT.md](TECH_DEBT.md): what is still open, what is deliberately left and what only looks
   like debt.
 
