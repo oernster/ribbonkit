@@ -264,6 +264,11 @@ the toolkit is written once in `_unix.go` files.
   Dock icon while its menu-bar icon stays. Wails makes it a regular application in
   `applicationWillFinishLaunching`, overriding `LSUIElement` and any earlier switch, so where
   launching has not finished the switch is made again on `NSApplicationDidFinishLaunchingNotification`.
+- **Quitting when macOS asks (macOS).** Wails answers every `applicationShouldTerminate:` with
+  `NSTerminateCancel` and hands it to the close handler, which hides the ribbon; a log out or restart
+  was interrupted. Only macOS sends that request (log out, restart, shut down, Activity Monitor),
+  since Wails' own quit stops the run loop, so the kit replaces the delegate's answer with
+  `NSTerminateNow`. Closing the window comes through `windowShouldClose:` and still hides.
 - **The window Wails shows too early (Linux).** Wails maps its window with `gtk_widget_show_all`
   before GTK's main loop starts, `StartHidden` or not; in the Flatpak it showed as a black window
   over most of the screen at login. `New` hooks every widget's `map` signal before Wails runs: a

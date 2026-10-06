@@ -13,6 +13,10 @@ void *test_window(const char *title);
 void test_window_close(void *ribbon);
 void ribbon_leave_dock(void);
 int ribbon_skips_dock(void);
+void ribbon_honour_quit(void);
+void test_refusing_delegate(void);
+int test_quits(void);
+void test_no_delegate(void);
 */
 import "C"
 
@@ -42,11 +46,30 @@ func FindRibbon(_, name string) (Window, error) {
 	})
 }
 
-// HideFromTaskbar keeps the application off the Dock on macOS (FR-101); its menu-bar icon stays.
-// The Dock belongs to the application rather than the window, so ribbon is not used.
+// HideFromTaskbar settles how the application stands with macOS once Wails has launched it. It is
+// kept off the Dock with its menu-bar icon staying (FR-101); it quits when macOS asks it to, as at
+// log out or restart. Both belong to the application rather than the window, so ribbon is not used.
 func HideFromTaskbar(Window) error {
-	cocoamain.Do(func() { C.ribbon_leave_dock() })
+	cocoamain.Do(func() {
+		C.ribbon_leave_dock()
+		C.ribbon_honour_quit()
+	})
 	return nil
+}
+
+// withRefusingDelegate runs test with a delegate that refuses to quit as Wails' does, then takes it
+// away; for the tests, whose application has no delegate of its own.
+func withRefusingDelegate(test func()) {
+	cocoamain.Do(func() { C.test_refusing_delegate() })
+	defer cocoamain.Do(func() { C.test_no_delegate() })
+	test()
+}
+
+// quits answers whether the application agrees when macOS asks it to quit.
+func quits() bool {
+	var agreed bool
+	cocoamain.Do(func() { agreed = C.test_quits() != 0 })
+	return agreed
 }
 
 // veilEarlyMaps does nothing on macOS, where Wails keeps a window that starts hidden off the screen.
