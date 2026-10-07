@@ -264,6 +264,10 @@ the toolkit is written once in `_unix.go` files.
   Dock icon while its menu-bar icon stays. Wails makes it a regular application in
   `applicationWillFinishLaunching`, overriding `LSUIElement` and any earlier switch, so where
   launching has not finished the switch is made again on `NSApplicationDidFinishLaunchingNotification`.
+  That moment as a regular application made the Dock record the ribbon as a recent app at every
+  launch, so a constructor in `application_darwin.m` wraps Wails' handler at process start: it runs
+  whole while its switch to regular is refused. The bundle's `LSUIElement` covers the check-in before
+  any code runs; each product's build script declares it.
 - **Quitting when macOS asks (macOS).** Wails answers every `applicationShouldTerminate:` with
   `NSTerminateCancel` and hands it to the close handler, which hides the ribbon; a log out or restart
   was interrupted. Only macOS sends that request (log out, restart, shut down, Activity Monitor),

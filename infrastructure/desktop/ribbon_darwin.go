@@ -17,6 +17,9 @@ void ribbon_honour_quit(void);
 void test_refusing_delegate(void);
 int test_quits(void);
 void test_no_delegate(void);
+int test_finish_launching(void);
+void test_wrap_regular_delegate(void);
+int test_policy_settable(void);
 */
 import "C"
 
@@ -70,6 +73,27 @@ func quits() bool {
 	var agreed bool
 	cocoamain.Do(func() { agreed = C.test_quits() != 0 })
 	return agreed
+}
+
+// staysAccessoryThroughLaunch answers whether the application is still an accessory after a
+// delegate that makes it regular, as Wails' does, has finished launching it.
+func staysAccessoryThroughLaunch() bool {
+	var stayed bool
+	cocoamain.Do(func() { stayed = C.test_finish_launching() != 0 })
+	return stayed
+}
+
+// wrapRegularDelegate wraps that delegate as the kit wraps Wails' at process start.
+func wrapRegularDelegate() {
+	cocoamain.Do(func() { C.test_wrap_regular_delegate() })
+}
+
+// policySettable answers whether the application can still be made regular outside the wrapped
+// handler, as a fault in restoring AppKit's own method would prevent.
+func policySettable() bool {
+	var made bool
+	cocoamain.Do(func() { made = C.test_policy_settable() != 0 })
+	return made
 }
 
 // veilEarlyMaps does nothing on macOS, where Wails keeps a window that starts hidden off the screen.

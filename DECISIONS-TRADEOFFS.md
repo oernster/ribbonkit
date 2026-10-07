@@ -178,18 +178,20 @@ One copy runs per user under the application's id; a second launch shows or hide
 
 On Windows and Linux the window's taskbar button is removed before it is first shown. On macOS the
 application becomes an accessory once Wails has finished launching it, so it has no Dock icon; its
-menu-bar icon is how it is reached. Each product's bundle also declares `LSUIElement`. Wails
-overrides it as it launches, so it cannot do the job alone. What it does is make the application
-check in with macOS as an agent: without it the Dock recorded the ribbon as a recent app before any
-code ran and kept a tile for it after every launch (measured 2026-10-07).
+menu-bar icon is how it is reached. Two more steps keep it out of the Dock's recent apps, which
+recorded it at every launch (measured 2026-10-07 from the Mac's log). Each product's bundle
+declares `LSUIElement`, so the application checks in with macOS as an agent before any code runs.
+Wails then makes it regular as it finishes launching; the kit wraps Wails' handler at process start
+so that switch is refused while the rest of the handler runs.
 
 - **Rather than:** accepting the button everywhere; `LSUIElement` alone, which Wails overrides; the
-  switch alone, which leaves a recents tile in the Dock.
+  switch to an accessory, alone or with `LSUIElement`, which still left a recents tile either way;
+  rewriting Wails' handler, which would copy code a Wails upgrade could change.
 - **Gains:** the ribbon stays out of the way; no Dock Quit reaches a close handler that hides rather
   than quits.
 - **Costs:** on Windows it rests on swapping Wails' window style and on macOS on undoing Wails'
-  activation policy, both checked by hand on any Wails upgrade; with no Dock icon there is no app
-  switcher entry either.
+  activation policy and on finding its delegate by the class name `AppDelegate`, all checked by hand
+  on any Wails upgrade; with no Dock icon there is no app switcher entry either.
 
 ### The early window veiled on Linux
 

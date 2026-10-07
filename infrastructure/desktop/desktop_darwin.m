@@ -10,10 +10,6 @@
 #import <objc/runtime.h>
 #include "_cgo_export.h"
 
-// The type encoding of applicationShouldTerminate:, used where the delegate has no such method to
-// copy one from: an NSUInteger answer, the receiver, the selector and the NSApplication.
-#define SHOULD_TERMINATE_TYPES "Q@:@"
-
 // The test window's size before a test places it; placing it replaces both.
 #define TEST_WINDOW_WIDTH 200
 #define TEST_WINDOW_HEIGHT 100
@@ -39,57 +35,6 @@ void *ribbon_find(const char *title)
         }
     }
     return NULL;
-}
-
-// ribbon_leave_dock makes the application an accessory: no Dock icon and no place in the
-// application switcher, while its menu-bar icon stays (FR-101). Wails makes the application
-// regular in applicationWillFinishLaunching, which overrides LSUIElement and any earlier switch
-// (measured 2026-10-06), so where launching has not finished the switch is made again once it has.
-void ribbon_leave_dock(void)
-{
-    [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
-    if ([[NSRunningApplication currentApplication] isFinishedLaunching]) {
-        return;
-    }
-    __block id observer = [[NSNotificationCenter defaultCenter]
-        addObserverForName:NSApplicationDidFinishLaunchingNotification
-                    object:nil
-                     queue:[NSOperationQueue mainQueue]
-                usingBlock:^(NSNotification *note) {
-        [NSApp setActivationPolicy:NSApplicationActivationPolicyAccessory];
-        [[NSNotificationCenter defaultCenter] removeObserver:observer];
-        observer = nil;
-    }];
-}
-
-// ribbon_terminate_now answers macOS's request to quit with yes.
-static NSApplicationTerminateReply ribbon_terminate_now(id self, SEL command, NSApplication *sender)
-{
-    return NSTerminateNow;
-}
-
-// ribbon_honour_quit makes the application quit when macOS asks it to: at log out, restart and shut
-// down, and from Activity Monitor or a script. Wails answers every such request with
-// NSTerminateCancel and hands it to the window's close handler, which hides the ribbon rather than
-// quitting, so the request was refused and a restart interrupted (measured 2026-10-06: a quit Apple
-// event was answered "User cancelled"). Closing the window does not come here, so it still hides.
-// Without a delegate AppKit already quits, so there is nothing to answer.
-void ribbon_honour_quit(void)
-{
-    id delegate = [NSApp delegate];
-    if (delegate == nil) {
-        return;
-    }
-    SEL selector = @selector(applicationShouldTerminate:);
-    Method existing = class_getInstanceMethod([delegate class], selector);
-    const char *types = existing != NULL ? method_getTypeEncoding(existing) : SHOULD_TERMINATE_TYPES;
-    class_replaceMethod([delegate class], selector, (IMP)ribbon_terminate_now, types);
-}
-
-// ribbon_skips_dock answers whether the application is an accessory, kept off the Dock.
-int ribbon_skips_dock(void)
-{
-    return [NSApp activationPolicy] == NSApplicationActivationPolicyAccessory;
 }
 
 // ribbon_place stands the window with its top-left corner at x, y at width by height.
@@ -298,40 +243,6 @@ void *test_window(const char *title)
     window.releasedWhenClosed = NO;
     [window orderFrontRegardless];
     return (__bridge_retained void *)window;
-}
-
-// RibbonRefusingDelegate refuses to quit as Wails' delegate does, for the tests.
-@interface RibbonRefusingDelegate : NSObject <NSApplicationDelegate>
-@end
-
-@implementation RibbonRefusingDelegate
-- (NSApplicationTerminateReply)applicationShouldTerminate:(NSApplication *)sender
-{
-    return NSTerminateCancel;
-}
-@end
-
-// The test delegate, kept alive while it is the application's delegate, which holds it weakly.
-static RibbonRefusingDelegate *testDelegate = nil;
-
-// test_refusing_delegate makes a delegate that refuses to quit the application's delegate.
-void test_refusing_delegate(void)
-{
-    testDelegate = [[RibbonRefusingDelegate alloc] init];
-    [NSApp setDelegate:testDelegate];
-}
-
-// test_quits answers whether the application's delegate agrees to quit.
-int test_quits(void)
-{
-    return [[NSApp delegate] applicationShouldTerminate:NSApp] == NSTerminateNow;
-}
-
-// test_no_delegate takes the test delegate away again.
-void test_no_delegate(void)
-{
-    [NSApp setDelegate:nil];
-    testDelegate = nil;
 }
 
 // test_window_close closes a test window. AppKit may keep a closed window in its list for a while,
