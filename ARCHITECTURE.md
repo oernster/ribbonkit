@@ -106,9 +106,11 @@ no test watches for that.
   the longest name it can replace) and `settingsfile` (a ribbon's settings file: what every
   application's does alike, each application saying through a `Codec` what its own holds, with the
   ribbon's choices written under the kit's keys and a list read one entry at a time, an entry it
-  could not read written back as found); per
-  platform `monitors`, `startup`, `appdata`, `runlog`, `desktop` (tray, native menus, the ribbon's
-  window, the end of a move, the desktop's broadcasts, the pointer, the browser opener) and
+  could not read written back as found). `iconscale` makes the small copies of the application's
+  icon the Linux tray and icon theme take. Per platform: `monitors`, `startup`, `appdata` (the
+  folder a ribbon keeps its settings and log in, named for the application), `runlog` (the run's
+  log in that folder, standard error pointed at it first), `desktop` (tray, native menus, the
+  ribbon's window, the end of a move, the desktop's broadcasts, the pointer, the browser opener) and
   `occupancy` (the folder every running ribbon shares). `delivery` is the work behind every
   ribbon's build tools, each a whole command an application's tool hands its product's names: the
   Windows version resource, the names the macOS and Linux scripts read (Wails' single-instance bus
@@ -117,7 +119,8 @@ no test watches for that.
   only tests import.
   Linux only: `gtkmain`. macOS only: `cocoamain`. `platform` is what every composition root does
   for its platform before the window opens: on Linux, GTK sent through X11 at import; `Prepare`, the
-  icon handed to the tray and a request to end from outside heard, on Linux and macOS; and
+  icon handed to the tray and a request to end from outside heard, on Linux and macOS, with a
+  shutdown or restart logind announces taken as one on Linux; and
   `GeneratingBindings`, true only in the run `wails build` makes to generate bindings.
 - **UI**: `window`, the ribbon's window as the page and the desktop see it.
 
@@ -136,7 +139,7 @@ no test watches for that.
   named in the application's words; `ribbon.css` styles both. `shell.ts` (`useShell`) holds the
   application's snapshot, taken by a call the application passes in, routes the window's open-panel
   words to its panels, reloads on Go's refresh and draws the theme, colour scheme and opacity.
-  Help, About and Licence are its panels (`Help.tsx`, `help.css`). The palette's ribbon half is
+  About, Licence and the update check's outcome are its panels (`Help.tsx`, `help.css`). The palette's ribbon half is
   `theme.css` (Classic) and `colours.css` (every other scheme). The menus' choices reach an
   application's Settings as `MenuChoice` (`ChoiceDTO` and `ChoicesOf` in `ui/window/wire.go`), drawn
   by `MenuGroup` and `MenuToggle` (`MenuChoices.tsx`). `web/testing` is the stand-in bridge
@@ -181,8 +184,7 @@ Wails v2 offers one window, so the ribbon and every panel share it (CON-6). Open
 the window to its size in `PanelSizes`, centred on the ribbon's display within its work area. The
 kit's panels are Settings, About, Licence and the update check's; an application adds its own in
 `PanelSizes.Own` by the word its page names each by; `useShell` takes those words as its second
-type parameter. A word of the kit's stays the kit's.
-closing returns the ribbon to where it was. While a panel is open a move is not recorded and a change
+type parameter. A word of the kit's stays the kit's. Closing returns the ribbon to where it was. While a panel is open a move is not recorded and a change
 of length waits for the close.
 
 **A panel fits its content (FR-621).** Once a panel has opened, `panelFit.ts` measures it at its own
@@ -296,8 +298,10 @@ the toolkit is written once in `_unix.go` files.
 - **Menus.** The Linux tray is the kit's own StatusNotifierItem with a `com.canonical.dbusmenu` menu
   over godbus, registered by object path so it needs no bus name or sandbox permission; macOS uses an
   `NSStatusItem` rebuilt as it opens.
-- **Sign-in (FR-605).** Windows writes a value under `HKCU\...\Run`; Linux an XDG autostart entry
-  (running `flatpak run` under the Flatpak); macOS a launchd agent.
+- **Sign-in (FR-605).** Windows writes a value under `HKCU\...\Run`; macOS a launchd agent; Linux an
+  XDG autostart entry. Under the Flatpak the entry runs `flatpak run` with the application's id and
+  goes to the real `~/.config/autostart`, since the session never reads the sandbox's own; the
+  Flatpak needs `--filesystem=xdg-config/autostart:create` for it.
 
 ## Help, About and Licence
 
@@ -305,7 +309,8 @@ About shows the application's picture, name, version, author, copyright line and
 Licence shows the licence text the application hands in, its type sized so the widest line fits
 (FR-608). Both read themselves when they overflow (FR-609) through one script,
 `installer/page/auto-scroll.js`, shared with the setup page, which can import nothing;
-`web/autoScroll.ts` types it and wraps it in a React hook.
+`web/autoScroll.ts` types it and wraps it in a React hook. The page's `openDonation` asks Go to
+hand the donation address the application named to the browser; the application draws the button.
 
 ## The update check
 
@@ -354,18 +359,7 @@ place, hide from the taskbar or fence the ribbon are logged and the ribbon carri
 
 ## Design decisions
 
-| Decision | Why | Rejected alternative |
-|---|---|---|
-| One repository for the Go module and the npm package, released under one tag | The window and its page half change together; one tag cannot pair a window with the wrong page | Two repositories, two version lines |
-| The page half shipped as TypeScript source | The application's own build compiles it with its own settings | A built bundle per release |
-| The kit names no product or repository | Two applications share it; a name written into the kit would be the wrong one for one of them | Constants in the kit |
-| Displays and placement through each desktop's own calls | Wails' screen list lacks origin, device name and work area; its position calls mix relative and absolute coordinates | Wails' position calls |
-| One window for the ribbon and every panel | Wails v2 offers one | A second window per panel |
-| Native popup menus | A page-drawn menu would be clipped by the small window | A menu drawn in the page |
-| The grip's cursor read from the desktop | The page's pointer events jumped backwards while the window resized under them | The page's `screenX`, `screenY` |
-| An entry per product in a shared folder, live while its ribbon holds a lock on a separate file | Each Flatpak sandbox has private folders, so the folder must be one both are granted; on Windows a lock on the entry itself would block others reading it; a lock ends with its process, so a crashed ribbon's entry is known to be dead | One shared file listing process ids |
-| A StatusNotifierItem of the kit's own | `fyne.io/systray` could not rebuild its menu as it opens and kept global state (v1.12.2) | `fyne.io/systray` |
-| Toolkit-free code shared in `_unix.go` | Linux and macOS cannot drift apart | A copy per platform |
-| The structural mechanics in the kit | An application and the kit are held by the same code | A copy of the checks per repository |
+What was chosen, what was rejected and what each costs is in
+[DECISIONS-TRADEOFFS.md](DECISIONS-TRADEOFFS.md).
 
 See also [TESTING.md](TESTING.md) and [DEVELOPMENT.md](DEVELOPMENT.md).

@@ -44,12 +44,14 @@ figure with the fraction dropped, so it fails once cover is lost.
 | `structure` | 33.6% | 33% |
 
 `domain/identity` and `application/shell` hold types and ports alone, with no statement to cover.
+On Windows `infrastructure/platform` holds a `Prepare` that does nothing and one constant, with no
+test file; its Linux half is tested there ([On macOS and Linux](#on-macos-and-linux)).
 
 Every figure is the Windows build's, which `test.ps1` measures. That build compiles 396 Go test
 functions, counted from the test files `go list` selects, plus one `TestMain` in
 `infrastructure/setup`. Twenty-four are the structural tests, which read the source and are the same
 on every platform; [ARCHITECTURE.md](ARCHITECTURE.md) lists each against its rule. The macOS build
-compiles 347 and the Linux build 353 ([On macOS and Linux](#on-macos-and-linux)).
+compiles 350 and the Linux build 356 ([On macOS and Linux](#on-macos-and-linux)).
 
 ### The web half
 
@@ -155,8 +157,8 @@ that platform with the tools [DEVELOPMENT.md](DEVELOPMENT.md) names.
 | What | macOS | Linux |
 |---|---|---|
 | Tags | `desktop,production` | `desktop,production,webkit2_41` |
-| Go test functions | 347, plus 3 `TestMain` | 353, plus 3 `TestMain` |
-| Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 16 | `gtkmain` 5, `monitors` 2, `desktop` 21 |
+| Go test functions | 350, plus 3 `TestMain` | 356, plus 3 `TestMain` |
+| Tests that need cgo | `cocoamain` 3, `monitors` 3, `desktop` 19 | `gtkmain` 5, `monitors` 2, `desktop` 23, `platform` 1 |
 | Needs | a signed-in desktop | a signed-in desktop with a display and a tray host |
 
 With the platform's tags in `TAGS` and the kit's own folders in `KIT` (`./...` would also reach a Go
@@ -185,6 +187,16 @@ go test -count=1 -tags "$TAGS" $KIT
 ```bash
 npm install && npm run lint && npm run typecheck && npm test
 ```
+
+What they prove: work handed to the toolkit's loop runs there and a panic reaches the caller;
+displays are read with their work areas, AppKit's rectangles turned over to count from the top; the
+ribbon is found by its title, kept off the taskbar, placed where asked and returned from a panel; a
+move ends only when the ribbon was not placed there; the drag distance is the desktop's own; the tray
+answers its host with a greyed disabled item. On macOS, a delegate that makes the application
+regular as it launches, as Wails' does, cannot; the application agrees when macOS asks it to quit.
+On Linux, GTK runs through X11 with the DMABUF renderer off unless chosen; a window mapped before
+GTK's loop is veiled until it is shown and no other window is touched; only logind announcing that a
+shutdown is starting ends the ribbon, a cancelled one not.
 
 staticcheck is the version `test.ps1` pins. The desktop tests open real windows, place them and read
 back where they stand; one registers a real tray or menu bar icon, so a person at the desktop sees

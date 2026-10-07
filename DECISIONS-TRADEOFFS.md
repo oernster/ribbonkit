@@ -55,7 +55,7 @@ Wails facade and the page half is React.
   kit's own type check, lint rules and test set-up.
 - **Costs:** an application's build must be able to compile the kit's TypeScript.
 
-### No stable API before 1.0
+### No stable API before the first major release
 
 - **Rather than:** freezing the calls an application makes from the first tag.
 - **Gains:** the kit can still be reshaped as the second ribbon finds what it needs.
@@ -106,9 +106,10 @@ refusal handler and answers null rather than rejecting.
 
 ### The structural checks are shared from the kit
 
-The mechanics of the layer, size, network, palette, contrast, timer and wire checks live in a package
-of the kit's own, run over a description of each repository's layout. The kit's own tests use it; so
-does each application.
+The mechanics of the layer, size, network, palette, contrast and wire checks live in a Go package of
+the kit's own, run over a description of each repository's layout; the scan holding a page's timers
+to an allow list lives in the page half's testing module. The kit's own tests use them; so does each
+application.
 
 - **Rather than:** a copy of the checks per repository.
 - **Gains:** an application and the kit are held by the same code; a fix to a check reaches both.
@@ -193,6 +194,17 @@ so that switch is refused while the rest of the handler runs.
   activation policy and on finding its delegate by the class name `AppDelegate`, all checked by hand
   on any Wails upgrade; with no Dock icon there is no app switcher entry either.
 
+### Quitting when macOS asks
+
+Wails refuses every request from macOS to quit and hands it to the close handler, which hides the
+ribbon; a log out or restart was interrupted. The kit answers that request with yes. Closing the
+window arrives by another way, so it still hides.
+
+- **Rather than:** leaving Wails' answer in place; making every close quit, which would lose the
+  ribbon that hides to its menu-bar icon.
+- **Gains:** log out, restart and shut down go through; Activity Monitor or a script can quit it.
+- **Costs:** the kit replaces a method on Wails' delegate, checked by hand on any Wails upgrade.
+
 ### The early window veiled on Linux
 
 Wails puts its window on screen before GTK's main loop starts, even when told to start hidden. A
@@ -200,7 +212,7 @@ window mapped before the loop runs is made fully transparent until it is next ma
 
 - **Rather than:** a smaller starting size, which GTK holds at the web view's minimum (measured: 400
   by 400 pixels, still a black square); a transparent starting background, applied too late to change
-  the first frame; patching Wails, whose v2.16.0 has the same code.
+  the first frame; patching Wails, whose later v2 releases have the same code.
 - **Gains:** no black window at login.
 - **Costs:** a hook on every widget's map signal for the life of the process, which does nothing
   once the loop runs and the window is shown; it depends on Wails mapping before the loop, checked by
@@ -229,7 +241,9 @@ the desktop, the page's reading taken only where the desktop cannot answer.
 - **Costs:** a ribbon centred on an edge is off-centre once resized, until it is next arranged; one
   pointer reading per platform to keep.
 
-### The web view's data lives inside the settings folder
+### The web view's data lives inside the settings folder on Windows
+
+Only Windows lets the web view's data folder be chosen.
 
 - **Rather than:** Wails' default, a folder named for the executable beside the settings folder.
 - **Gains:** forgetting the settings at uninstall removes the web view's data with them.
@@ -497,6 +511,19 @@ the size the window has when it arrives. The end of a move is the ribbon standin
 - **Rather than:** setting size and place together, as macOS does.
 - **Gains:** the ribbon lands where it was put.
 - **Costs:** a placing can wait briefly; a move ends a moment after the pointer stops.
+
+### Leaving before a restart begins
+
+At a restart systemd stops GNOME Shell and the ribbon together. The ribbon's window went while GNOME
+Shell was losing Xwayland, so GNOME Shell waited for an answer until it was killed. The ribbon holds
+a delay lock from logind and leaves as soon as logind announces a shutdown or restart, while the
+desktop is still whole, by the path any request to end from outside takes.
+
+- **Rather than:** relying on the end signal systemd sends, which races GNOME Shell's teardown of
+  Xwayland.
+- **Gains:** a restart no longer hangs on the ribbon; a shutdown that is cancelled leaves it running.
+- **Costs:** a Flatpak must be granted logind on the system bus; without it the ribbon carries on as
+  before and says so in its log. logind holds the shutdown for the ribbon, up to its own limit.
 
 ## The setup program
 

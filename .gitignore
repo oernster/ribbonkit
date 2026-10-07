@@ -37,3 +37,6 @@ node_modules/
 
 # Local Claude session files
 .claude/
+
+# Release notes, rebuilt for each release and never committed
+NOTES.md

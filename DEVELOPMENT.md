@@ -8,7 +8,7 @@ Terminal's shell elsewhere. Testing is in [TESTING.md](TESTING.md).
 
 | Tool | Version | What for | Where from |
 |---|---|---|---|
-| Go | 1.26.3, as `go.mod` declares | the Go module and its tests | [go.dev/dl](https://go.dev/dl/) |
+| Go | the version `go.mod` declares | the Go module and its tests | [go.dev/dl](https://go.dev/dl/) |
 | Node.js with npm | a current LTS | the web half's lint, type check and tests | [nodejs.org](https://nodejs.org/) or `winget install OpenJS.NodeJS.LTS` |
 | Xcode (macOS) | current | cgo's compiler for the AppKit half | the App Store |
 | GTK 3 and WebKitGTK 4.1 headers (Linux) | as the distribution ships | cgo's compiler for the GTK half | `sudo apt-get install -y build-essential pkg-config libgtk-3-dev libwebkit2gtk-4.1-dev` |
@@ -49,10 +49,17 @@ Go then builds the application against the kit's working copy. The application's
 `GOWORK=off`, so what it ships is always the tagged kit. Delete the `go.work` once the kit is tagged
 and the application names the new tag.
 
+## Generated assets
+
+The kit has no generated assets of its own. `tools/genicons.py` writes an application's icons
+([ARCHITECTURE.md](ARCHITECTURE.md#outside-the-layers)); the application runs it by hand through its
+own `tools/genicons.py` and commits the output. It needs Python with Pillow; no build runs it.
+
 ## Cutting a release
 
-The tag is the version: Go reads it from git and the application's `package.json` names it. A tag
-before `v1.0.0` may change what an application calls.
+The tag is the version: there is no version file. Go reads the tag from git and the application's
+`package.json` names it. Until the first major release a minor tag may change what an application
+calls.
 
 1. Run `./test.ps1` on Windows and read its exit code.
 2. Run the checks in [TESTING.md](TESTING.md#on-macos-and-linux) on a Mac and on Linux.
@@ -66,12 +73,13 @@ before `v1.0.0` may change what an application calls.
 | Path | What it holds |
 |---|---|
 | `domain`, `application` | the pure rules (placement, the ribbon's choices, hovering, the application's names) and the use cases over their ports (arranging the ribbon, the menus, the update check, the desktop's port) |
-| `infrastructure` | the adapters: the desktop, displays, sign-in start, the log, the data folder, the folder every running ribbon shares, a file replaced whole, the settings file, time zones, the update check, the install policy and a file held open for tests; a file's platform is in its name (`_windows`, `_linux`, `_darwin`, `_unix`) |
+| `infrastructure` | the adapters: the desktop, displays, sign-in start, the log, the data folder, the folder every running ribbon shares, a file replaced whole, the settings file, time zones, the update check, icon scaling, the build tools' work, the install policy, what a composition root prepares per platform (`platform`), the toolkits' main threads and a file held open for tests; a file's platform is in its name (`_windows`, `_linux`, `_darwin`, `_unix`) or its build tag, its C and Objective-C halves beside it (`.c`, `.m`) |
 | `ui/window` | the ribbon's window: its life and the desktop's events, the tab, the pull out, panels, the grip, opacity, menu choices, the update check, Help, the first showing and the Wails options (`run.go`) |
 | `installer` | the setup program's window: its page (`page/`, no build step), the facade the page calls and `Run` |
 | `web`, `package.json` | the page's half, an npm package shipped as source; `web/testing` is the stand-in bridge, Go's events and the one test set-up |
 | `structure` | the structural tests' mechanics, shared with every application |
 | `tests/structural` | the kit's own structural tests |
+| `tools` | `genicons.py`, the icon generator an application runs by hand |
 | `test.ps1` | the gate |
 | `tsconfig.json`, `eslint.config.js`, `vite.config.ts` | the web half's settings, which an application's front end may extend or spread |
 
