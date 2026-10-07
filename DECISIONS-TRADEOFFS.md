@@ -178,10 +178,13 @@ One copy runs per user under the application's id; a second launch shows or hide
 
 On Windows and Linux the window's taskbar button is removed before it is first shown. On macOS the
 application becomes an accessory once Wails has finished launching it, so it has no Dock icon; its
-menu-bar icon is how it is reached.
+menu-bar icon is how it is reached. Each product's bundle also declares `LSUIElement`. Wails
+overrides it as it launches, so it cannot do the job alone. What it does is make the application
+check in with macOS as an agent: without it the Dock recorded the ribbon as a recent app before any
+code ran and kept a tile for it after every launch (measured 2026-10-07).
 
-- **Rather than:** accepting the button everywhere; `LSUIElement` in the bundle, which Wails
-  overrides as it launches.
+- **Rather than:** accepting the button everywhere; `LSUIElement` alone, which Wails overrides; the
+  switch alone, which leaves a recents tile in the Dock.
 - **Gains:** the ribbon stays out of the way; no Dock Quit reaches a close handler that hides rather
   than quits.
 - **Costs:** on Windows it rests on swapping Wails' window style and on macOS on undoing Wails'
