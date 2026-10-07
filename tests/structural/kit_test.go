@@ -25,6 +25,13 @@ var (
 	setupExtensions = []string{".html", ".css", ".js"}
 )
 
+// The C and Objective-C halves of the infrastructure, written by hand beside the Go that calls
+// them; they are source like any other, so the line caps reach them too.
+var (
+	nativeDir        = "infrastructure"
+	nativeExtensions = []string{".c", ".m", ".h"}
+)
+
 // kitLayout answers the kit's layout: its layers sit at the repository's root and it is laid out
 // on no other module. Nothing in it wires the application to the infrastructure.
 func kitLayout(t *testing.T) structure.Layout {
@@ -42,6 +49,12 @@ func goFiles(t *testing.T) []string {
 func webFiles(t *testing.T) []string {
 	t.Helper()
 	return structure.FilesWith(t, webExtensions, filepath.Join(structure.Root(t), webDir))
+}
+
+// nativeFiles answers the infrastructure's C and Objective-C source files.
+func nativeFiles(t *testing.T) []string {
+	t.Helper()
+	return structure.FilesWith(t, nativeExtensions, filepath.Join(structure.Root(t), nativeDir))
 }
 
 // setupPageFiles answers the setup page's own source files; the images beside them are artwork.

@@ -30,7 +30,7 @@ mechanics in `structure` ([below](#outside-the-layers)); a guard not listed here
 | Neither application nor infrastructure imports the UI | `TestNothingBelowTheUIImportsIt` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Infrastructure never imports Wails | `TestWailsStaysOutOfInfrastructure` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Nothing in the kit outside infrastructure imports both application and infrastructure: each application wires the kit in its own composition root. An infrastructure file importing both is an adapter implementing a port, not wiring | `TestNothingWiresTheApplicationToTheInfrastructure` | [`boundary_test.go`](tests/structural/boundary_test.go) |
-| No source file exceeds 400 lines: Go, the web half's TypeScript and CSS, the setup page | `TestNoFileExceedsLineLimit` | [`boundary_test.go`](tests/structural/boundary_test.go) |
+| No source file exceeds 400 lines: Go, its C and Objective-C halves, the web half's TypeScript and CSS, the setup page | `TestNoFileExceedsLineLimit` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | No source file sits in the danger band of 381 to 400 lines | `TestNoFileInDangerBand` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | Every exported type carries a doc comment | `TestEveryExportedTypeIsDocumented` | [`boundary_test.go`](tests/structural/boundary_test.go) |
 | The kit holds its four layers, `web`, `installer`, `structure`, `tests` and `tools` and no other folder, so none escapes the layer rules | `TestTheKitHoldsOnlyItsLayersThePageAndTheSetupProgram` | [`folders_test.go`](tests/structural/folders_test.go) |

@@ -36,10 +36,12 @@ func TestNothingWiresTheApplicationToTheInfrastructure(t *testing.T) {
 	kitLayout(t).CheckCompositionRootIsWhitelisted(t, goFiles(t))
 }
 
-// sourceFiles is every file the size rule governs: the Go, the web half and the setup page.
+// sourceFiles is every file the size rule governs: the Go, its C and Objective-C halves, the web
+// half and the setup page.
 func sourceFiles(t *testing.T) []string {
 	t.Helper()
-	return append(append(goFiles(t), webFiles(t)...), setupPageFiles(t)...)
+	files := append(goFiles(t), nativeFiles(t)...)
+	return append(append(files, webFiles(t)...), setupPageFiles(t)...)
 }
 
 func TestNoFileExceedsLineLimit(t *testing.T) {
